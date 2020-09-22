@@ -7,9 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import User from './entities/user.entity';
 import { COUNTRY_CODE } from './models/country-code.model';
 import * as crypto from 'crypto';
 import {
@@ -17,13 +15,15 @@ import {
   FirebaseAdminSDK,
 } from '@tfarras/nestjs-firebase-admin';
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import User from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(FIREBASE_ADMIN_INJECT) private firebaseAdmin: FirebaseAdminSDK,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject(FIREBASE_ADMIN_INJECT) private firebaseAdmin: FirebaseAdminSDK,
   ) {}
   async create(
     firstName: string,

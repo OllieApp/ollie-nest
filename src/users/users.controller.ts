@@ -1,4 +1,3 @@
-import { PHOTO_ALLOWED_EXTENSIONS } from './constants';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -9,7 +8,6 @@ import {
   Request,
   Param,
   HttpException,
-  HttpStatus,
   Post,
   Body,
   ForbiddenException,
@@ -22,6 +20,8 @@ import User from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
+import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
+import { HttpStatus } from '@nestjs/common/enums';
 
 @Controller('/users')
 export class UsersController {

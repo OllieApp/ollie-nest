@@ -20,7 +20,7 @@ import { PractitionerSchedulesService } from './services/practitioner-schedules.
     UsersService,
   ],
   controllers: [PractitionersController],
-  providers: [UsersService, PractitionersService, PractitionerSchedulesService],
+  providers: [PractitionersService, PractitionerSchedulesService],
   exports: [PractitionersService, PractitionerSchedulesService],
 })
 export class PractitionersModule {}

@@ -2,15 +2,15 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  CreateDateColumn,
   Index,
+  CreateDateColumn,
+  ManyToOne,
   JoinColumn,
 } from 'typeorm';
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
 
 @Entity('user')
-class User {
+export class User {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
