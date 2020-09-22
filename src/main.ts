@@ -18,6 +18,7 @@ async function bootstrap() {
       max: 120, // limit each IP to 100 requests per windowMs
     }),
   );
+  app.enableCors();
   await app.listen(3000);
 }
 bootstrap();
