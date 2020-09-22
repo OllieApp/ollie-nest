@@ -63,7 +63,17 @@ export class Practitioner {
   public consultationPricingRange: number;
 
   @ManyToMany(type => MedicalAid, { eager: true })
-  @JoinTable()
+  @JoinTable({
+    name: 'practitioner_medical_aids',
+    joinColumn: {
+      name: 'practitioner_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'medical_aid_id',
+      referencedColumnName: 'id',
+    },
+  })
   @JoinColumn({ name: 'medical_aid_id' })
   public medicalAids: MedicalAid[];
 
@@ -78,9 +88,15 @@ export class Practitioner {
   @JoinColumn({ name: 'category_id' })
   public category: PractitionerCategory;
 
-  @OneToOne(type => User, { nullable: false, eager: true })
+  @Column({ name: 'category_id' })
+  public categoryId: number;
+
+  @OneToOne(type => User, { nullable: false })
   @JoinColumn({ name: 'created_by' })
-  public createdBy: User;
+  public createdBy: Promise<User>;
+
+  @Column({ type: 'bigint', name: 'created_by' })
+  public createdById: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -138,8 +154,17 @@ export class Practitioner {
   public gender: GENDER;
 
   @ManyToMany(type => Language, { nullable: false, eager: true })
-  @JoinTable()
-  @JoinColumn({ name: 'language_id' })
+  @JoinTable({
+    name: 'practitioner_languages',
+    joinColumn: {
+      name: 'practitioner_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'language_id',
+      referencedColumnName: 'id',
+    },
+  })
   public languages: Language[];
 
   @Column({ name: 'avatar_url', nullable: true, type: 'text' })

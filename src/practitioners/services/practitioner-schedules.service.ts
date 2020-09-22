@@ -22,7 +22,7 @@ export class PractitionerSchedulesService {
         practitionerId,
       );
       await this.schedulesRepository.delete({
-        practitioner: { id: practitionerId },
+        practitionerId,
       });
 
       return await this.schedulesRepository.save(schedules);
@@ -69,7 +69,7 @@ export class PractitionerSchedulesService {
         });
       }
       await this.schedulesRepository.delete({
-        practitioner: { id: practitionerId },
+        practitionerId,
       });
 
       return await this.schedulesRepository.save(schedules);
@@ -110,9 +110,7 @@ export class PractitionerSchedulesService {
           }
 
           return this.schedulesRepository.create({
-            practitioner: {
-              id: practitionerId,
-            },
+            practitionerId,
             dayOfWeek,
             startTime,
             endTime,

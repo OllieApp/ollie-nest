@@ -1,3 +1,4 @@
+import { UsersModule } from './../users/users.module';
 import { PractitionersController } from './practitioners.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,13 +12,13 @@ import { PractitionerSchedulesService } from './services/practitioner-schedules.
 
 @Module({
   imports: [
+    UsersModule,
     TypeOrmModule.forFeature([
       Practitioner,
       PractitionerCategory,
       PractitionerSchedule,
       Language,
     ]),
-    UsersService,
   ],
   controllers: [PractitionersController],
   providers: [PractitionersService, PractitionerSchedulesService],

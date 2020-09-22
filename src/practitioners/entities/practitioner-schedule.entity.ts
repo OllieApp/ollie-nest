@@ -41,9 +41,11 @@ export class PractitionerSchedule {
     practitioner => practitioner.schedules,
     {
       nullable: false,
-      eager: true,
     },
   )
   @JoinColumn({ name: 'practitioner_id' })
-  practitioner: Practitioner;
+  practitioner: Promise<Practitioner>;
+
+  @Column({ type: 'bigint', name: 'practitioner_id' })
+  practitionerId: string;
 }

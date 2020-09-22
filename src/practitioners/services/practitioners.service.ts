@@ -51,9 +51,7 @@ export class PractitionersService {
       const newPractitioner = this.practitionerRepository.create({
         email,
         gender,
-        createdBy: {
-          id: userId,
-        },
+        createdById: userId,
         title,
         category: {
           id: category,
@@ -74,7 +72,7 @@ export class PractitionersService {
         (
           await this.practitionerRepository.find({
             select: ['id'],
-            where: { createdBy: userId },
+            where: { createdById: userId },
           })
         )?.map(p => p.id) ?? []
       );
