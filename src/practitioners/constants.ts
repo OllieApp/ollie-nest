@@ -1,0 +1,16 @@
+import { PractitionerScheduleModel } from './models/practitioner-schedule.model';
+import { WEEK_DAY } from './models/weekday.model';
+export const defaultSchedule: PractitionerScheduleModel = {
+  daysOfWeek: [
+    WEEK_DAY.Monday,
+    WEEK_DAY.Tuesday,
+    WEEK_DAY.Wednesday,
+    WEEK_DAY.Thursday,
+    WEEK_DAY.Friday,
+  ],
+  startTime: '09:00',
+  endTime: '17:00',
+};
+export const timeFormat = 'HH:mm';
+export const FIREBASE_STORAGE_PRACTITIONERS_AVATARS_BUCKET =
+  'gs://practitioners.ollie.health/';
