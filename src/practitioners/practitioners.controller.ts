@@ -1,8 +1,8 @@
-import { PractitionerIdsForUser } from './models/practitioner-for-user.model';
+import { PractitionerIdsForUser } from './dto/practitioner-for-user.dto';
 import { timeFormat } from './constants';
 import { MEDICAL_AID } from './../medical_aids/models/medical_aid.model';
 import { Practitioner } from './entities/practitioner.entity';
-import { CreatePractitionerDto } from './dto/create-practitioner.dto';
+import { CreatePractitionerRequest } from './requests/create-practitioner.request';
 import { UsersService } from './../users/users.service';
 import {
   BadRequestException,
@@ -21,12 +21,11 @@ import {
   UploadedFile,
 } from '@nestjs/common/decorators/http/route-params.decorator';
 import { AuthGuard } from '@nestjs/passport';
-import { PractitionerModel } from './models/practitioner.model';
+import { PractitionerDto } from './dto/practitioner.dto';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-admin';
 import { PractitionerSchedulesService } from './services/practitioner-schedules.service';
-import { PRACTITIONER_CATEGORY } from './models/category.model';
 import { format } from 'date-fns';
-import { UpdatePractitionerDto } from './dto/update-practitioner.dto';
+import { UpdatePractitionerRequest } from './requests/update-practitioner.request';
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
@@ -43,16 +42,10 @@ export class PractitionersController {
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
-    @Body() createPractitionerDto: CreatePractitionerDto,
-  ): Promise<PractitionerModel> {
+    @Body() createPractitionerDto: CreatePractitionerRequest,
+  ): Promise<PractitionerDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    if (!user) {
-      throw new NotFoundException({
-        message: 'The user used to authenticate was not found.',
-      });
-    }
-
     const practitioner = await this.practitionersService.createPractitioner(
       user.id,
       createPractitionerDto,
@@ -81,7 +74,7 @@ export class PractitionersController {
   async get(
     @Request() req,
     @Param('id') practitionerId: string,
-  ): Promise<PractitionerModel> {
+  ): Promise<PractitionerDto> {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
@@ -134,7 +127,7 @@ export class PractitionersController {
   async update(
     @Request() req,
     @Param('id') practitionerId: string,
-    @Body() updatePractitionerDto: UpdatePractitionerDto,
+    @Body() updatePractitionerDto: UpdatePractitionerRequest,
   ) {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);

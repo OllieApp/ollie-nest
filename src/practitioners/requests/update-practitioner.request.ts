@@ -1,10 +1,10 @@
-import { Location } from './../models/location.model';
+import { Location } from '../dto/location.dto';
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
-import { PRACTITIONER_CATEGORY } from '../models/category.model';
-import { LANGUAGE } from '../models/language.model';
-import { PractitionerScheduleModel } from '../models/practitioner-schedule.model';
+import { PRACTITIONER_CATEGORY } from '../dto/category.dto';
+import { LANGUAGE } from '../dto/language.dto';
+import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 
-export interface UpdatePractitionerDto {
+export class UpdatePractitionerRequest {
   title?: string;
   email?: string;
   phone?: string;
@@ -16,6 +16,6 @@ export interface UpdatePractitionerDto {
   category?: PRACTITIONER_CATEGORY;
   location?: Location;
   isActive?: boolean;
-  schedules?: PractitionerScheduleModel[];
+  schedules?: PractitionerScheduleDto[];
   languages?: LANGUAGE[];
 }

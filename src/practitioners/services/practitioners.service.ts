@@ -1,8 +1,8 @@
-import { LANGUAGE } from './../models/language.model';
-import { PRACTITIONER_CATEGORY } from './../models/category.model';
+import { LANGUAGE } from '../dto/language.dto';
+import { PRACTITIONER_CATEGORY } from '../dto/category.dto';
 import { MEDICAL_AID } from './../../medical_aids/models/medical_aid.model';
-import { UpdatePractitionerDto } from './../dto/update-practitioner.dto';
-import { CreatePractitionerDto } from './../dto/create-practitioner.dto';
+import { UpdatePractitionerRequest } from '../requests/update-practitioner.request';
+import { CreatePractitionerRequest } from '../requests/create-practitioner.request';
 import {
   BadRequestException,
   Inject,
@@ -32,7 +32,7 @@ export class PractitionersService {
 
   async createPractitioner(
     userId: string,
-    createPractitionerDto: CreatePractitionerDto,
+    createPractitionerDto: CreatePractitionerRequest,
   ): Promise<Practitioner> {
     const { title, category, email, gender } = createPractitionerDto;
 
@@ -103,7 +103,7 @@ export class PractitionersService {
 
   async updatePractitioner(
     practitionerId: string,
-    data: UpdatePractitionerDto,
+    data: UpdatePractitionerRequest,
   ) {
     if (data.title && data.title.trim().length == 0) {
       throw new BadRequestException({

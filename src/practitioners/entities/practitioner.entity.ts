@@ -18,7 +18,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PractitionerCategory } from './practitioner-category.entity';
-import { GENDER } from '../models/gender.model';
+import { GENDER } from '../dto/gender.dto';
 
 @Entity('practitioner')
 @Check(`"consultation_pricing_range" % 100 = 0`)

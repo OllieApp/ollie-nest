@@ -1,6 +1,6 @@
 import { defaultSchedule } from './../constants';
 import { PractitionerSchedule } from './../entities/practitioner-schedule.entity';
-import { PractitionerScheduleModel } from './../models/practitioner-schedule.model';
+import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -36,7 +36,7 @@ export class PractitionerSchedulesService {
   }
 
   async replaceCurrentSchedules(
-    newSchedules: PractitionerScheduleModel[],
+    newSchedules: PractitionerScheduleDto[],
     practitionerId: string,
   ) {
     try {
@@ -83,7 +83,7 @@ export class PractitionerSchedulesService {
   }
 
   private mapScheduleModelsToScheduleEntities(
-    schedules: PractitionerScheduleModel[],
+    schedules: PractitionerScheduleDto[],
     practitionerId: string,
   ): PractitionerSchedule[] {
     const mappedSchedules = new Array<PractitionerSchedule>();

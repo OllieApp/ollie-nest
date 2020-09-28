@@ -1,5 +1,5 @@
 import { FIREBASE_STORAGE_USERS_AVATARS_BUCKET } from './constants';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserRequest } from './requests/update-user.request';
 import {
   BadRequestException,
   Inject,
@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { COUNTRY_CODE } from './models/country-code.model';
+import { COUNTRY_CODE } from './dto/country-code.dto';
 import * as crypto from 'crypto';
 import {
   FIREBASE_ADMIN_INJECT,
@@ -58,7 +58,7 @@ export class UsersService {
     }
   }
 
-  async update(updatedUser: UpdateUserDto, uid: string) {
+  async update(updatedUser: UpdateUserRequest, uid: string) {
     const user = await this.getUserForUid(uid);
     if (!user) {
       throw new NotFoundException({ message: 'The user could not be found.' });

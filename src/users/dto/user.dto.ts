@@ -1,6 +1,5 @@
-import { COUNTRY_CODE } from './country-code.model';
-import { MEDICAL_AID } from './../../medical_aids/models/medical_aid.model';
-export interface UserModel {
+import { MEDICAL_AID } from '../../medical_aids/models/medical_aid.model';
+export class UserDto {
   id: string;
   firstName: string;
   lastName: string;

@@ -1,6 +1,6 @@
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 
-export interface UpdateUserDto {
+export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   countryCode?: string;

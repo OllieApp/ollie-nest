@@ -1,6 +1,6 @@
-import { PractitionerScheduleModel } from './models/practitioner-schedule.model';
-import { WEEK_DAY } from './models/weekday.model';
-export const defaultSchedule: PractitionerScheduleModel = {
+import { PractitionerScheduleDto } from './dto/practitioner-schedule.dto';
+import { WEEK_DAY } from './dto/weekday.model';
+export const defaultSchedule: PractitionerScheduleDto = {
   daysOfWeek: [
     WEEK_DAY.Monday,
     WEEK_DAY.Tuesday,

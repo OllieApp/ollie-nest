@@ -1,4 +1,4 @@
-import { WEEK_DAY } from '../models/weekday.model';
+import { WEEK_DAY } from '../dto/weekday.model';
 import {
   Column,
   Entity,

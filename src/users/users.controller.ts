@@ -1,6 +1,6 @@
-import { UserModel } from './models/user.model';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
+import { UpdateUserRequest } from './requests/update-user.request';
+import { CreateUserRequest } from './requests/create-user.request';
 import { UsersService } from './users.service';
 import {
   Controller,
@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
-import { COUNTRY_CODE } from './models/country-code.model';
+import { COUNTRY_CODE } from './dto/country-code.dto';
 
 @Controller('/users')
 export class UsersController {
@@ -27,7 +27,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard('firebase'))
-  async get(@Request() req): Promise<UserModel> {
+  async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
     return {
@@ -40,8 +40,8 @@ export class UsersController {
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<UserModel> {
+    @Body() createUserDto: CreateUserRequest,
+  ): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const createdUser = await this.usersService.create(
       createUserDto.firstName,
@@ -60,7 +60,7 @@ export class UsersController {
 
   @Put()
   @UseGuards(AuthGuard('firebase'))
-  async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Request() req, @Body() updateUserDto: UpdateUserRequest) {
     const firebaseUser = req.user as FirebaseUser;
     await this.usersService.update(updateUserDto, firebaseUser.uid);
   }
