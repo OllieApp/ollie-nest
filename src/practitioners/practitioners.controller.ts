@@ -85,12 +85,6 @@ export class PractitionersController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    if (!userId) {
-      throw new NotFoundException({
-        message: 'The user used to authenticate was not found.',
-      });
-    }
-
     const practitioner = await this.practitionersService.getPractitionerForUserId(
       practitionerId,
       userId,
@@ -130,12 +124,6 @@ export class PractitionersController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    if (!userId) {
-      throw new NotFoundException({
-        message: 'The user used to authenticate was not found.',
-      });
-    }
-
     return {
       ids: await this.practitionersService.getPractitionersIdsForUserId(userId),
     };
@@ -150,12 +138,6 @@ export class PractitionersController {
   ) {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
-
-    if (!userId) {
-      throw new NotFoundException({
-        message: 'The user used to authenticate was not found.',
-      });
-    }
 
     const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
       userId,
@@ -197,12 +179,6 @@ export class PractitionersController {
   ): Promise<string> {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
-
-    if (!userId) {
-      throw new NotFoundException({
-        message: 'The user used to authenticate was not found.',
-      });
-    }
 
     const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
       userId,

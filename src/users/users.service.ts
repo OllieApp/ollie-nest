@@ -33,6 +33,13 @@ export class UsersService {
     uid: string,
     picture?: string,
   ): Promise<User> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.uid = :uid', { uid })
+      .getOne();
+    if (user) {
+      return user;
+    }
     // We don't need to check if the user already exists as the unique constraint for the uid will fire off
     const newUser = this.userRepository.create({
       uid,
@@ -72,7 +79,10 @@ export class UsersService {
           'The provided medical aid is not in the supported medical aid range',
       });
     }
-    if (updatedUser.countryCode && !(updatedUser.countryCode in COUNTRY_CODE)) {
+    if (
+      updatedUser.countryCode &&
+      !Object.values(COUNTRY_CODE).find(e => e == updatedUser.countryCode)
+    ) {
       throw new BadRequestException({
         message:
           'The provided country code is not in the supported country code list',
@@ -107,13 +117,15 @@ export class UsersService {
     }
   }
 
-  async getUserForUid(uid: string): Promise<User | null> {
-    return (
-      (await this.userRepository
-        .createQueryBuilder('user')
-        .where('user.uid = :uid', { uid })
-        .getOne()) ?? null
-    );
+  async getUserForUid(uid: string): Promise<User> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.uid = :uid', { uid })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException({ message: 'The user was not found.' });
+    }
+    return user;
   }
 
   // this will have to move to a file service at a later point
@@ -167,6 +179,11 @@ export class UsersService {
       },
     );
 
+    // update the firebase user to have the same photo
+    this.firebaseAdmin.auth().updateUser(uid, {
+      photoURL: url,
+    });
+
     return url;
   }
 
@@ -203,14 +220,8 @@ export class UsersService {
     );
   }
 
-  async getUserIdForUid(uid: string): Promise<string | null> {
-    return (
-      (
-        await this.userRepository.findOne({
-          select: ['id'],
-          where: { uid: uid },
-        })
-      )?.id ?? null
-    );
+  async getUserIdForUid(uid: string): Promise<string> {
+    const user = await this.getUserForUid(uid);
+    return user.id;
   }
 }

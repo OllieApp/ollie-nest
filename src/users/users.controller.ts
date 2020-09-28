@@ -1,3 +1,4 @@
+import { UserModel } from './models/user.model';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -6,11 +7,8 @@ import {
   Get,
   UseGuards,
   Request,
-  Param,
-  HttpException,
   Post,
   Body,
-  ForbiddenException,
   Put,
   UseInterceptors,
   UploadedFile,
@@ -21,24 +19,21 @@ import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
-import { HttpStatus } from '@nestjs/common/enums';
+import { COUNTRY_CODE } from './models/country-code.model';
 
 @Controller('/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':uid')
+  @Get()
   @UseGuards(AuthGuard('firebase'))
-  async get(@Request() req, @Param('uid') uid: string): Promise<User> {
+  async get(@Request() req): Promise<UserModel> {
     const firebaseUser = req.user as FirebaseUser;
-    if (uid != firebaseUser.uid) {
-      throw new ForbiddenException();
-    }
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    if (user) {
-      return user;
-    }
-    throw new HttpException('No content', HttpStatus.NO_CONTENT);
+    return {
+      ...user,
+      medicalAid: user.medicalAidId,
+    };
   }
 
   @Post()
@@ -46,16 +41,21 @@ export class UsersController {
   async create(
     @Request() req,
     @Body() createUserDto: CreateUserDto,
-  ): Promise<User> {
+  ): Promise<UserModel> {
     const firebaseUser = req.user as FirebaseUser;
-    return await this.usersService.create(
+    const createdUser = await this.usersService.create(
       createUserDto.firstName,
       createUserDto.lastName,
       firebaseUser.email,
-      'ZA',
+      COUNTRY_CODE.SouthAfrica,
       firebaseUser.uid,
       firebaseUser.picture,
     );
+
+    return {
+      ...createdUser,
+      medicalAid: createdUser.medicalAidId,
+    };
   }
 
   @Put()

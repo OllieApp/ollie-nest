@@ -10,7 +10,7 @@ import {
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
 
 @Entity('user')
-export class User {
+class User {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
@@ -64,6 +64,9 @@ export class User {
   @JoinColumn({ name: 'medical_aid_id' })
   medicalAid?: MedicalAid;
 
+  @Column({ type: 'int', name: 'medical_aid_id', nullable: true })
+  public medicalAidId?: number;
+
   @Column({
     type: 'boolean',
     name: 'is_email_verified',
@@ -81,6 +84,15 @@ export class User {
   })
   @Index()
   public isPhoneVerified: boolean;
+
+  @Column({
+    type: 'boolean',
+    name: 'is_active',
+    nullable: false,
+    default: true,
+  })
+  @Index()
+  public isActive: boolean;
 }
 
 export default User;
