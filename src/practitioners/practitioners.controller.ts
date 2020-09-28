@@ -30,7 +30,6 @@ import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 
 @Controller('/practitioners')
-@UseInterceptors(ClassSerializerInterceptor)
 export class PractitionersController {
   constructor(
     private readonly practitionersService: PractitionersService,

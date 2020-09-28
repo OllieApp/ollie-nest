@@ -21,19 +21,17 @@ import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/fi
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from './dto/country-code.dto';
 import { plainToClass } from 'class-transformer';
-import User from './entities/user.entity';
 
 @Controller('/users')
-@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
   @UseGuards(AuthGuard('firebase'))
-  async get(@Request() req): Promise<User> {
+  async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    return user;
+    return plainToClass(UserDto, { ...user, medicalAid: user.medicalAidId });
   }
 
   @Post()
@@ -41,7 +39,7 @@ export class UsersController {
   async create(
     @Request() req,
     @Body() createUserDto: CreateUserRequest,
-  ): Promise<User> {
+  ): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const createdUser = await this.usersService.create(
       createUserDto.firstName,
@@ -52,7 +50,10 @@ export class UsersController {
       firebaseUser.picture,
     );
 
-    return createdUser;
+    return plainToClass(UserDto, {
+      ...createdUser,
+      medicalAid: createdUser.medicalAidId,
+    });
   }
 
   @Put()
