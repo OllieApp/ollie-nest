@@ -1,4 +1,5 @@
 import { MEDICAL_AID } from '../../medical_aids/models/medical_aid.model';
+import User from '../entities/user.entity';
 export class UserDto {
   id: string;
   firstName: string;
@@ -16,4 +17,8 @@ export class UserDto {
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   isActive: boolean;
+
+  public static fromEntity(user: User): UserDto {
+    return { ...user, medicalAid: user.medicalAidId };
+  }
 }

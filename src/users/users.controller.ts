@@ -30,10 +30,7 @@ export class UsersController {
   async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    return {
-      ...user,
-      medicalAid: user.medicalAidId,
-    };
+    return UserDto.fromEntity(user);
   }
 
   @Post()
@@ -52,10 +49,7 @@ export class UsersController {
       firebaseUser.picture,
     );
 
-    return {
-      ...createdUser,
-      medicalAid: createdUser.medicalAidId,
-    };
+    return UserDto.fromEntity(createdUser);
   }
 
   @Put()
