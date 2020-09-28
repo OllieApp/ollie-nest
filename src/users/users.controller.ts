@@ -30,10 +30,10 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard('firebase'))
-  async get(@Request() req): Promise<UserDto> {
+  async get(@Request() req): Promise<User> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    return plainToClass(UserDto, { ...user, medicalAid: user.medicalAidId });
+    return user;
   }
 
   @Post()
