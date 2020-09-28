@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import admin from 'firebase-admin';
-import 'reflect-metadata';
 import * as rateLimit from 'express-rate-limit';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 
 async function bootstrap() {
   admin.initializeApp({
@@ -19,6 +19,7 @@ async function bootstrap() {
       max: 120, // limit each IP to 100 requests per windowMs
     }),
   );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.enableCors();
   await app.listen(80);
 }
