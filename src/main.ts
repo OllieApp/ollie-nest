@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import admin from 'firebase-admin';
+import 'reflect-metadata';
 import * as rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
