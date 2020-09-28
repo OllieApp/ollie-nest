@@ -30,6 +30,7 @@ import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 
 @Controller('/practitioners')
+@UseInterceptors(ClassSerializerInterceptor)
 export class PractitionersController {
   constructor(
     private readonly practitionersService: PractitionersService,
@@ -38,7 +39,6 @@ export class PractitionersController {
   ) {}
 
   @Post()
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
@@ -70,7 +70,6 @@ export class PractitionersController {
   }
 
   @Get(':id')
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async get(
     @Request() req,
@@ -110,7 +109,6 @@ export class PractitionersController {
   }
 
   @Get()
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async getPractitionerIds(
     @Request() req,

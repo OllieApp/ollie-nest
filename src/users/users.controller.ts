@@ -22,11 +22,11 @@ import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from './dto/country-code.dto';
 
 @Controller('/users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
@@ -35,7 +35,6 @@ export class UsersController {
   }
 
   @Post()
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
