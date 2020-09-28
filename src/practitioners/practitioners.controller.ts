@@ -55,7 +55,7 @@ export class PractitionersController {
       practitioner.id,
     );
 
-    return {
+    return new PractitionerDto({
       ...practitioner,
       medicalAids: [],
       category: practitioner.category.id,
@@ -66,7 +66,7 @@ export class PractitionersController {
         endTime: this.mapDateToTimeString(s.endTime),
       })),
       languages: [],
-    };
+    });
   }
 
   @Get(':id')
@@ -90,7 +90,7 @@ export class PractitionersController {
       });
     }
 
-    return {
+    return new PractitionerDto({
       ...practitioner,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
@@ -106,7 +106,7 @@ export class PractitionersController {
           }
         : null,
       languages: practitioner.languages.map(l => l.id),
-    };
+    });
   }
 
   @Get()
@@ -119,9 +119,9 @@ export class PractitionersController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    return {
-      ids: await this.practitionersService.getPractitionersIdsForUserId(userId),
-    };
+    return new PractitionerIdsForUser(
+      await this.practitionersService.getPractitionersIdsForUserId(userId),
+    );
   }
 
   @Put(':id')

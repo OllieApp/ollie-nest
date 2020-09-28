@@ -24,4 +24,8 @@ export class PractitionerDto {
   gender: GENDER;
   languages: LANGUAGE[];
   avatarUrl?: string;
+
+  constructor(partial: Partial<PractitionerDto>) {
+    Object.assign(this, partial);
+  }
 }
