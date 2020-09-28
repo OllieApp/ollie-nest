@@ -1,11 +1,10 @@
 import { PractitionerIdsForUser } from './dto/practitioner-for-user.dto';
 import { timeFormat } from './constants';
-import { MEDICAL_AID } from './../medical_aids/models/medical_aid.model';
-import { Practitioner } from './entities/practitioner.entity';
 import { CreatePractitionerRequest } from './requests/create-practitioner.request';
 import { UsersService } from './../users/users.service';
 import {
   BadRequestException,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   NotFoundException,
@@ -39,6 +38,7 @@ export class PractitionersController {
   ) {}
 
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
@@ -70,6 +70,7 @@ export class PractitionersController {
   }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async get(
     @Request() req,
@@ -109,6 +110,7 @@ export class PractitionersController {
   }
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async getPractitionerIds(
     @Request() req,

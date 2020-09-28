@@ -13,8 +13,8 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
-import User from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
@@ -26,6 +26,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
@@ -34,6 +35,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard('firebase'))
   async create(
     @Request() req,
