@@ -19,6 +19,7 @@ import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from './dto/country-code.dto';
+import { use } from 'passport';
 
 @Controller('/users')
 export class UsersController {
@@ -29,7 +30,24 @@ export class UsersController {
   async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    return new UserDto({ ...user, medicalAid: user.medicalAidId });
+    return new UserDto({
+      id: user.id,
+      address: user.address,
+      avatarUrl: user.avatarUrl,
+      city: user.city,
+      countryCode: user.countryCode,
+      email: user.email,
+      firstName: user.firstName,
+      isActive: user.isActive,
+      lastName: user.lastName,
+      phone: user.phone,
+      zipCode: user.zipCode,
+      medicalAidPlan: user.medicalAidPlan,
+      medicalAidNumber: user.medicalAidNumber,
+      medicalAid: user.medicalAidId,
+      isEmailVerified: user.isEmailVerified,
+      isPhoneVerified: user.isPhoneVerified,
+    });
   }
 
   @Post()
