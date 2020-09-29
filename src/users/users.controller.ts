@@ -13,14 +13,12 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from './dto/country-code.dto';
-import { plainToClass } from 'class-transformer';
 
 @Controller('/users')
 export class UsersController {
@@ -31,7 +29,7 @@ export class UsersController {
   async get(@Request() req): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    return plainToClass(UserDto, { ...user, medicalAid: user.medicalAidId });
+    return new UserDto({ ...user, medicalAid: user.medicalAidId });
   }
 
   @Post()
@@ -50,7 +48,7 @@ export class UsersController {
       firebaseUser.picture,
     );
 
-    return plainToClass(UserDto, {
+    return new UserDto({
       ...createdUser,
       medicalAid: createdUser.medicalAidId,
     });
