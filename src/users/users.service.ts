@@ -98,16 +98,16 @@ export class UsersService {
       await this.userRepository.update(
         { uid: uid },
         {
-          firstName: updatedUser.firstName?.trim(),
-          lastName: updatedUser.lastName?.trim(),
-          city: updatedUser.city?.trim(),
-          address: updatedUser.address?.trim(),
-          countryCode: updatedUser.countryCode?.trim(),
+          firstName: updatedUser.firstName?.trim() ?? undefined,
+          lastName: updatedUser.lastName?.trim() ?? undefined,
+          city: updatedUser.city?.trim() ?? undefined,
+          address: updatedUser.address?.trim() ?? undefined,
+          countryCode: updatedUser.countryCode?.trim() ?? undefined,
           medicalAid: { id: updatedUser.medicalAid },
-          medicalAidNumber: updatedUser.medicalAidNumber?.trim(),
-          medicalAidPlan: updatedUser.medicalAidPlan?.trim(),
-          zipCode: updatedUser.zipCode?.trim(),
-          phone: updatedUser.phone?.trim(),
+          medicalAidNumber: updatedUser.medicalAidNumber?.trim() ?? undefined,
+          medicalAidPlan: updatedUser.medicalAidPlan?.trim() ?? undefined,
+          zipCode: updatedUser.zipCode?.trim() ?? undefined,
+          phone: updatedUser.phone?.trim() ?? undefined,
         },
       );
     } catch (error) {
