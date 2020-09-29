@@ -60,6 +60,7 @@ export class UsersService {
 
   async update(updatedUser: UpdateUserRequest, uid: string) {
     const user = await this.getUserForUid(uid);
+
     if (!user) {
       throw new NotFoundException({ message: 'The user could not be found.' });
     }
@@ -95,21 +96,26 @@ export class UsersService {
       });
     }
     try {
-      await this.userRepository.update(
-        { uid: uid },
-        {
-          firstName: updatedUser.firstName?.trim() ?? undefined,
-          lastName: updatedUser.lastName?.trim() ?? undefined,
-          city: updatedUser.city?.trim() ?? undefined,
-          address: updatedUser.address?.trim() ?? undefined,
-          countryCode: updatedUser.countryCode?.trim() ?? undefined,
-          medicalAid: { id: updatedUser.medicalAid },
-          medicalAidNumber: updatedUser.medicalAidNumber?.trim() ?? undefined,
-          medicalAidPlan: updatedUser.medicalAidPlan?.trim() ?? undefined,
-          zipCode: updatedUser.zipCode?.trim() ?? undefined,
-          phone: updatedUser.phone?.trim() ?? undefined,
-        },
-      );
+      const removeEmpty = (obj: any) => {
+        Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
+      };
+
+      const updateObject = {
+        firstName: updatedUser.firstName?.trim() ?? undefined,
+        lastName: updatedUser.lastName?.trim() ?? undefined,
+        city: updatedUser.city?.trim() ?? undefined,
+        address: updatedUser.address?.trim() ?? undefined,
+        countryCode: updatedUser.countryCode?.trim() ?? undefined,
+        medicalAidNumber: updatedUser.medicalAidNumber?.trim() ?? undefined,
+        medicalAidPlan: updatedUser.medicalAidPlan?.trim() ?? undefined,
+        medicalAidId: updatedUser.medicalAid ?? undefined,
+        zipCode: updatedUser.zipCode?.trim() ?? undefined,
+        phone: updatedUser.phone?.trim() ?? undefined,
+      };
+
+      removeEmpty(updateObject);
+
+      await this.userRepository.update({ uid: uid }, updateObject);
     } catch (error) {
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
