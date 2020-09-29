@@ -72,6 +72,7 @@ export class UsersController {
     });
   }
 
+  // Might be a good idea to return the updated user
   @Put()
   @UseGuards(AuthGuard('firebase'))
   async update(@Request() req, @Body() updateUserDto: UpdateUserRequest) {

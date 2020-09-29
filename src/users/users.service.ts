@@ -102,7 +102,7 @@ export class UsersService {
           lastName: updatedUser.lastName?.trim(),
           city: updatedUser.city?.trim(),
           address: updatedUser.address?.trim(),
-          countryCode: updatedUser.countryCode,
+          countryCode: updatedUser.countryCode?.trim(),
           medicalAid: { id: updatedUser.medicalAid },
           medicalAidNumber: updatedUser.medicalAidNumber?.trim(),
           medicalAidPlan: updatedUser.medicalAidPlan?.trim(),
