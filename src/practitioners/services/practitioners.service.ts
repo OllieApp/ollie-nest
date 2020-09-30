@@ -20,6 +20,7 @@ import {
   FirebaseAdminSDK,
 } from '@tfarras/nestjs-firebase-admin';
 import * as crypto from 'crypto';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Injectable()
 export class PractitionersService {
@@ -159,7 +160,10 @@ export class PractitionersService {
     }
 
     try {
-      this.practitionerRepository.update(practitionerId, {
+      const removeEmpty = (obj: any) => {
+        Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
+      };
+      const updatedPractitioner: QueryDeepPartialEntity<Practitioner> = {
         ...data,
         medicalAids: data.medicalAids
           ? data.medicalAids.map(m => ({ id: m }))
@@ -176,7 +180,11 @@ export class PractitionersService {
             }
           : null,
         languages: data.languages ? data.languages.map(l => ({ id: l })) : null,
-      });
+      };
+
+      removeEmpty(updatedPractitioner);
+
+      this.practitionerRepository.update(practitionerId, updatedPractitioner);
     } catch (error) {
       throw new InternalServerErrorException({
         message:
