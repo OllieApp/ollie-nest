@@ -116,6 +116,12 @@ export class UsersService {
       removeEmpty(updateObject);
 
       await this.userRepository.update({ uid: uid }, updateObject);
+      if (updateObject.firstName || updateObject.lastName) {
+        this.firebaseAdmin.auth().updateUser(uid, {
+          displayName: `${updateObject.firstName ??
+            user.firstName} ${updateObject.lastName ?? user.lastName}`,
+        });
+      }
     } catch (error) {
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
