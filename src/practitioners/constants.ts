@@ -1,5 +1,6 @@
 import { PractitionerScheduleDto } from './dto/practitioner-schedule.dto';
 import { WEEK_DAY } from './dto/weekday.model';
+// time is UTC
 export const defaultSchedule: PractitionerScheduleDto = {
   daysOfWeek: [
     WEEK_DAY.Monday,
@@ -8,8 +9,8 @@ export const defaultSchedule: PractitionerScheduleDto = {
     WEEK_DAY.Thursday,
     WEEK_DAY.Friday,
   ],
-  startTime: '09:00',
-  endTime: '17:00',
+  startTime: '07:00',
+  endTime: '15:00',
 };
 export const timeFormat = 'HH:mm';
 export const FIREBASE_STORAGE_PRACTITIONERS_AVATARS_BUCKET =

@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { COUNTRY_CODE } from './dto/country-code.dto';
+import { COUNTRY_CODE } from '../shared/country-code.dto';
 import * as crypto from 'crypto';
 import {
   FIREBASE_ADMIN_INJECT,
@@ -64,12 +64,12 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException({ message: 'The user could not be found.' });
     }
-    if (updatedUser.firstName.trim().length == 0) {
+    if (updatedUser.firstName?.trim().length == 0) {
       throw new BadRequestException({
         message: 'The first name of the user cannot be empty',
       });
     }
-    if (updatedUser.lastName.trim().length == 0) {
+    if (updatedUser.lastName?.trim().length == 0) {
       throw new BadRequestException({
         message: 'The last name of the user cannot be empty',
       });
@@ -81,7 +81,7 @@ export class UsersService {
       });
     }
     if (
-      updatedUser.countryCode &&
+      updatedUser.countryCode?.trim() &&
       !Object.values(COUNTRY_CODE).find(e => e == updatedUser.countryCode)
     ) {
       throw new BadRequestException({

@@ -18,8 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
-import { COUNTRY_CODE } from './dto/country-code.dto';
-import { use } from 'passport';
+import { COUNTRY_CODE } from '../shared/country-code.dto';
 
 @Controller('/users')
 export class UsersController {
