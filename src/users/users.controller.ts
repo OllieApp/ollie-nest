@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
@@ -91,11 +92,15 @@ export class UsersController {
   async uploadFile(@Request() req, @UploadedFile() file): Promise<string> {
     const firebaseUser = req.user as FirebaseUser;
     if (!req.file) {
+      Logger.log('The image to be uploaded was missing from the request.');
       throw new BadRequestException({
         message: 'The image to be uploaded was missing from the request.',
       });
     }
     if (!PHOTO_ALLOWED_EXTENSIONS.test(file.mimetype)) {
+      Logger.log(
+        `Only the following types are supported: JPG, JPEG and PNG. The one used was ${file.mimetype}`,
+      );
       throw new BadRequestException({
         message: 'Only the following types are supported: JPG, JPEG and PNG.',
       });
