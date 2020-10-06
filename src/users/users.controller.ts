@@ -93,13 +93,15 @@ export class UsersController {
   async uploadFile(@Request() req, @UploadedFile() file): Promise<string> {
     const firebaseUser = req.user as FirebaseUser;
     if (!req.file) {
-      this.logger.log('The image to be uploaded was missing from the request.');
+      this.logger.error(
+        'The image to be uploaded was missing from the request.',
+      );
       throw new BadRequestException({
         message: 'The image to be uploaded was missing from the request.',
       });
     }
     if (!PHOTO_ALLOWED_EXTENSIONS.test(file.mimetype)) {
-      this.logger.log(
+      this.logger.error(
         `Only the following types are supported: JPG, JPEG and PNG. The one used was ${file.mimetype}`,
       );
       throw new BadRequestException({
