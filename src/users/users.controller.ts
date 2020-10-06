@@ -23,6 +23,7 @@ import { COUNTRY_CODE } from '../shared/country-code.dto';
 
 @Controller('/users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
@@ -92,13 +93,13 @@ export class UsersController {
   async uploadFile(@Request() req, @UploadedFile() file): Promise<string> {
     const firebaseUser = req.user as FirebaseUser;
     if (!req.file) {
-      Logger.log('The image to be uploaded was missing from the request.');
+      this.logger.log('The image to be uploaded was missing from the request.');
       throw new BadRequestException({
         message: 'The image to be uploaded was missing from the request.',
       });
     }
     if (!PHOTO_ALLOWED_EXTENSIONS.test(file.mimetype)) {
-      Logger.log(
+      this.logger.log(
         `Only the following types are supported: JPG, JPEG and PNG. The one used was ${file.mimetype}`,
       );
       throw new BadRequestException({
