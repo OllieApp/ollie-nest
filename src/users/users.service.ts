@@ -182,7 +182,7 @@ export class UsersService {
         expires: new Date(2999, 12, 31),
         action: 'read',
       })
-    )[0];
+    )[0].split('?')[0];
 
     await this.userRepository.update(
       { uid: uid },
