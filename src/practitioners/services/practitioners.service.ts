@@ -226,8 +226,8 @@ export class PractitionersService {
       //Log this at a later point
     }
 
-    const file = bucket.file(fileName);
-    await file.save(dataBuffer, {
+    const file = bucket.file(`${fileName}_${Date.now()}`);
+    await file.save(dataBuffer.buffer, {
       gzip: true,
       contentType: fileType,
       public: true,
@@ -235,10 +235,10 @@ export class PractitionersService {
 
     const url = (
       await file.getSignedUrl({
-        expires: '31.12.2999',
+        expires: new Date(2999, 12, 31),
         action: 'read',
       })
-    )[0];
+    )[0].split('?')[0];
 
     await this.practitionerRepository.update(
       { id: practitionerId },

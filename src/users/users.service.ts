@@ -173,7 +173,7 @@ export class UsersService {
     const file = bucket.file(`${fileName}_${Date.now()}`);
     await file.save(dataBuffer.buffer, {
       gzip: true,
-      contentType: ['jpeg', 'jpg', 'png'].filter(e => fileType.includes(e))[0],
+      contentType: fileType,
       public: true,
     });
 
