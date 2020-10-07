@@ -17,7 +17,6 @@ import {
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from './entities/user.entity';
-import { PHOTO_ALLOWED_EXTENSIONS_COLLECTION } from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -174,9 +173,7 @@ export class UsersService {
     const file = bucket.file(`${fileName}_${Date.now()}`);
     await file.save(dataBuffer.buffer, {
       gzip: true,
-      contentType: PHOTO_ALLOWED_EXTENSIONS_COLLECTION.filter(e =>
-        fileType.includes(e),
-      )[0],
+      contentType: ['jpeg', 'jpg', 'png'].filter(e => fileType.includes(e))[0],
       public: true,
     });
 
