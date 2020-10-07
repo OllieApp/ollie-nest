@@ -171,7 +171,7 @@ export class UsersService {
     }
 
     const file = bucket.file(fileName);
-    await file.save(dataBuffer, {
+    await file.save(dataBuffer.buffer, {
       gzip: true,
       contentType: fileType,
       public: true,

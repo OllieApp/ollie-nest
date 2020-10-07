@@ -108,6 +108,7 @@ export class UsersController {
         message: 'Only the following types are supported: JPG, JPEG and PNG.',
       });
     }
+
     return await this.usersService.updateAvatar(
       file,
       firebaseUser.uid,
