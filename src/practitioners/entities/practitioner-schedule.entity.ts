@@ -25,14 +25,14 @@ export class PractitionerSchedule {
   @Column({
     name: 'start_time',
     nullable: false,
-    type: 'time',
+    type: 'time with time zone',
   })
   public startTime: Date;
 
   @Column({
     name: 'end_time',
     nullable: false,
-    type: 'time',
+    type: 'time with time zone',
   })
   public endTime: Date;
 
@@ -44,8 +44,8 @@ export class PractitionerSchedule {
     },
   )
   @JoinColumn({ name: 'practitioner_id' })
-  practitioner: Promise<Practitioner>;
+  public practitioner: Promise<Practitioner>;
 
   @Column({ type: 'bigint', name: 'practitioner_id' })
-  practitionerId: string;
+  public practitionerId: string;
 }

@@ -1,3 +1,5 @@
+import Appointment from '../../appointments/entities/appointment.entity';
+import Review from 'src/reviews/entities/review.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,6 +8,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
 
@@ -14,20 +17,20 @@ class User {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
-  @Column({ name: 'first_name', nullable: false, type: 'text' })
+  @Column({ name: 'first_name', nullable: false, type: 'text', length: 150 })
   public firstName: string;
 
-  @Column({ name: 'last_name', nullable: false, type: 'text' })
+  @Column({ name: 'last_name', nullable: false, type: 'text', length: 100 })
   public lastName: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', length: 150 })
   public email: string;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'text', length: 50 })
   public phone: string;
 
   @Index()
-  @Column({ unique: true, nullable: false, type: 'text' })
+  @Column({ unique: true, nullable: false, type: 'text', length: 200 })
   public uid: string;
 
   @Column({ name: 'avatar_url', nullable: true, type: 'text' })
@@ -42,7 +45,7 @@ class User {
   @Column({ nullable: true, type: 'text' })
   public city?: string;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'text', length: 300 })
   public address?: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
@@ -93,6 +96,29 @@ class User {
   })
   @Index()
   public isActive: boolean;
+
+  @Column({
+    type: 'boolean',
+    name: 'accepted_terms',
+    nullable: false,
+    default: true,
+  })
+  @Index()
+  public acceptedTerms: boolean;
+
+  @OneToMany(
+    type => Appointment,
+    appointment => appointment.user,
+    { eager: false },
+  )
+  public appointments: Promise<Appointment[]>;
+
+  @OneToMany(
+    type => Review,
+    review => review.user,
+    { eager: false },
+  )
+  public reviews: Promise<Review[]>;
 }
 
 export default User;

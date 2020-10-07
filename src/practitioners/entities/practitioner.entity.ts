@@ -19,6 +19,9 @@ import {
 } from 'typeorm';
 import { PractitionerCategory } from './practitioner-category.entity';
 import { GENDER } from '../dto/gender.dto';
+import Appointment from 'src/appointments/entities/appointment.entity';
+import { COUNTRY_CODE } from 'src/shared/country-code.dto';
+import Review from 'src/reviews/entities/review.entity';
 
 @Entity('practitioner')
 @Check(`"consultation_pricing_range" % 100 = 0`)
@@ -91,7 +94,7 @@ export class Practitioner {
   @Column({ name: 'category_id' })
   public categoryId: number;
 
-  @OneToOne(type => User, { nullable: false })
+  @OneToOne(type => User, { nullable: false, eager: false })
   @JoinColumn({ name: 'created_by' })
   public createdBy: Promise<User>;
 
@@ -146,8 +149,8 @@ export class Practitioner {
   public schedules: PractitionerSchedule[];
 
   @Column({
-    type: 'enum',
-    enum: GENDER,
+    type: 'by',
+    unsigned: true,
     default: GENDER.Other,
     nullable: false,
   })
@@ -169,4 +172,34 @@ export class Practitioner {
 
   @Column({ name: 'avatar_url', nullable: true, type: 'text' })
   public avatarUrl?: string;
+
+  @OneToMany(
+    type => Appointment,
+    appointment => appointment.practitioner,
+  )
+  public appointments: Promise<Appointment[]>;
+
+  @Column({
+    name: 'country_code',
+    type: 'text',
+    default: COUNTRY_CODE.SouthAfrica,
+    nullable: false,
+  })
+  public countryCode: string;
+
+  @Column({
+    type: 'boolean',
+    name: 'accepted_terms',
+    nullable: false,
+    default: true,
+  })
+  @Index()
+  public acceptedTerms: boolean;
+
+  @OneToMany(
+    type => Review,
+    review => review.practitioner,
+    { eager: false },
+  )
+  public reviews: Promise<Review[]>;
 }

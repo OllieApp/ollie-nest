@@ -12,7 +12,7 @@ class MedicalAid {
   @PrimaryGeneratedColumn('increment')
   public id: number;
 
-  @Column()
+  @Column({ nullable: false, type: 'text', unique: true })
   public name: string;
 
   @OneToMany(
