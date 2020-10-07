@@ -1,7 +1,3 @@
-import {
-  PHOTO_ALLOWED_EXTENSIONS,
-  PHOTO_ALLOWED_EXTENSIONS_COLLECTION,
-} from './../constants';
 import { FIREBASE_STORAGE_USERS_AVATARS_BUCKET } from './constants';
 import { UpdateUserRequest } from './requests/update-user.request';
 import {
@@ -21,6 +17,7 @@ import {
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from './entities/user.entity';
+import { PHOTO_ALLOWED_EXTENSIONS_COLLECTION } from 'src/constants';
 
 @Injectable()
 export class UsersService {
