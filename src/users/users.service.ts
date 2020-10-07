@@ -179,7 +179,7 @@ export class UsersService {
 
     const url = (
       await file.getSignedUrl({
-        expires: '31-12-2999',
+        expires: new Date(2999, 12, 31),
         action: 'read',
       })
     )[0];
