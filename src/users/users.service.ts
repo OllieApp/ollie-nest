@@ -1,3 +1,7 @@
+import {
+  PHOTO_ALLOWED_EXTENSIONS,
+  PHOTO_ALLOWED_EXTENSIONS_COLLECTION,
+} from './../constants';
 import { FIREBASE_STORAGE_USERS_AVATARS_BUCKET } from './constants';
 import { UpdateUserRequest } from './requests/update-user.request';
 import {
@@ -170,10 +174,12 @@ export class UsersService {
       //Log this at a later point
     }
 
-    const file = bucket.file(fileName);
+    const file = bucket.file(`${fileName}_${Date.now()}`);
     await file.save(dataBuffer.buffer, {
       gzip: true,
-      contentType: fileType,
+      contentType: PHOTO_ALLOWED_EXTENSIONS_COLLECTION.filter(e =>
+        fileType.includes(e),
+      )[0],
       public: true,
     });
 
