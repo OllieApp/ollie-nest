@@ -1,4 +1,4 @@
-import { Practitioner } from 'src/practitioners/entities/practitioner.entity';
+import Practitioner from 'src/practitioners/entities/practitioner.entity';
 import Review from 'src/reviews/entities/review.entity';
 import User from 'src/users/entities/user.entity';
 import {

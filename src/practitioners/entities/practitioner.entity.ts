@@ -26,7 +26,7 @@ import Review from 'src/reviews/entities/review.entity';
 @Entity('practitioner')
 @Check(`"consultation_pricing_range" % 100 = 0`)
 @Check(`"rating" >= 0 AND "rating" <= 5`)
-export class Practitioner {
+class Practitioner {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
@@ -149,7 +149,7 @@ export class Practitioner {
   public schedules: PractitionerSchedule[];
 
   @Column({
-    type: 'by',
+    type: 'smallint',
     unsigned: true,
     default: GENDER.Other,
     nullable: false,
@@ -203,3 +203,4 @@ export class Practitioner {
   )
   public reviews: Promise<Review[]>;
 }
+export default Practitioner;

@@ -7,13 +7,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Practitioner } from './practitioner.entity';
+import Practitioner from './practitioner.entity';
 
 @Entity('practitioner_schedule')
 export class PractitionerSchedule {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
+  @Index()
   @Column({
     name: 'day_of_week',
     nullable: false,

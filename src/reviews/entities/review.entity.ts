@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Practitioner } from 'src/practitioners/entities/practitioner.entity';
+import Practitioner from 'src/practitioners/entities/practitioner.entity';
 
 @Check(`"wait_time_rating" >= 0 AND "wait_time_rating" <= 5`)
 @Check(`"bedside_manner_rating" >= 0 AND "bedside_manner_rating" <= 5`)
