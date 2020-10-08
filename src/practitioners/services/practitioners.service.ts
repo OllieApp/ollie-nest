@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Practitioner } from '../entities/practitioner.entity';
+import Practitioner from '../entities/practitioner.entity';
 import { emailValidationPattern } from 'src/constants';
 import { FIREBASE_STORAGE_PRACTITIONERS_AVATARS_BUCKET } from '../constants';
 import {

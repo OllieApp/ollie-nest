@@ -10,7 +10,7 @@ import {
 import Practitioner from './practitioner.entity';
 
 @Entity('practitioner_schedule')
-export class PractitionerSchedule {
+class PractitionerSchedule {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
@@ -50,3 +50,4 @@ export class PractitionerSchedule {
   @Column({ type: 'bigint', name: 'practitioner_id' })
   public practitionerId: string;
 }
+export default PractitionerSchedule;

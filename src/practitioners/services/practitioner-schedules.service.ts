@@ -1,5 +1,5 @@
 import { defaultSchedule } from './../constants';
-import { PractitionerSchedule } from './../entities/practitioner-schedule.entity';
+import PractitionerSchedule from './../entities/practitioner-schedule.entity';
 import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

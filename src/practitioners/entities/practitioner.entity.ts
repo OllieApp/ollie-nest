@@ -1,5 +1,5 @@
 import { Language } from './language.entity';
-import { PractitionerSchedule } from './practitioner-schedule.entity';
+import PractitionerSchedule from './practitioner-schedule.entity';
 import { Geometry } from 'geojson';
 import MedicalAid from 'src/medical_aids/entities/medical_aid.entity';
 import User from 'src/users/entities/user.entity';
