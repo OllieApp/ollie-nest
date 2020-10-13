@@ -134,5 +134,8 @@ class Appointment {
 
   @Column({ type: 'text', name: 'user_video_url', nullable: true })
   public userVideoUrl?: string;
+
+  @Column({ type: 'text', name: 'virtual_meeting_id', nullable: true })
+  public virtualMeetingId?: string;
 }
 export default Appointment;
