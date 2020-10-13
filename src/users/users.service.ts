@@ -17,6 +17,7 @@ import {
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from './entities/user.entity';
+import { emailValidationPattern } from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -33,15 +34,52 @@ export class UsersService {
     uid: string,
     picture?: string,
   ): Promise<User> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.uid = :uid', { uid })
-      .getOne();
+    let user: User | null = null;
+
+    try {
+      user = await this.userRepository
+        .createQueryBuilder('user')
+        .where('user.uid = :uid', { uid })
+        .getOne();
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message:
+          'Something went wrong while checking for any existing users with this identity.',
+      });
+    }
+
     if (user) {
       return user;
     }
+    if (!firstName || firstName.trim().length == 0) {
+      throw new BadRequestException({
+        message: 'The first name of the user cannot be empty.',
+      });
+    }
+    if (!lastName || lastName.trim().length == 0) {
+      throw new BadRequestException({
+        message: 'The last name of the user cannot be empty.',
+      });
+    }
+
+    if (!emailValidationPattern.test(email)) {
+      throw new BadRequestException({
+        message: 'The email of the user is invalid.',
+      });
+    }
+
+    if (
+      !countryCode ||
+      !Object.values(COUNTRY_CODE).find(e => e == countryCode)
+    ) {
+      throw new BadRequestException({
+        message:
+          'The provided country code for the user is not in the supported country code list.',
+      });
+    }
+
     // We don't need to check if the user already exists as the unique constraint for the uid will fire off
-    const newUser = this.userRepository.create({
+    user = this.userRepository.create({
       uid,
       firstName,
       lastName,
@@ -50,7 +88,7 @@ export class UsersService {
       avatarUrl: picture,
     });
     try {
-      return await this.userRepository.save(newUser);
+      return await this.userRepository.save(user);
     } catch (error) {
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
@@ -66,18 +104,18 @@ export class UsersService {
     }
     if (updatedUser.firstName?.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The first name of the user cannot be empty',
+        message: 'The first name of the user cannot be empty.',
       });
     }
     if (updatedUser.lastName?.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The last name of the user cannot be empty',
+        message: 'The last name of the user cannot be empty.',
       });
     }
     if (updatedUser.medicalAid && !(updatedUser.medicalAid in MEDICAL_AID)) {
       throw new BadRequestException({
         message:
-          'The provided medical aid is not in the supported medical aid range',
+          'The provided medical aid is not in the supported medical aid range.',
       });
     }
     if (
@@ -86,7 +124,7 @@ export class UsersService {
     ) {
       throw new BadRequestException({
         message:
-          'The provided country code is not in the supported country code list',
+          'The provided country code is not in the supported country code list.',
       });
     }
     if (!(updatedUser.medicalAid in MEDICAL_AID)) {
