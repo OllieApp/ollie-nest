@@ -1,7 +1,11 @@
 import { defaultSchedule } from './../constants';
 import PractitionerSchedule from './../entities/practitioner-schedule.entity';
 import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { areIntervalsOverlapping, toDate } from 'date-fns';
@@ -64,7 +68,10 @@ export class PractitionerSchedulesService {
               { start: schedule.startTime, end: schedule.endTime },
             )
           ) {
-            throw new Error('In the schedule collection dates cannot overlap.');
+            throw new UnprocessableEntityException({
+              message:
+                'In the schedule collection times for the same day cannot overlap.',
+            });
           }
         });
       }

@@ -4,9 +4,9 @@ import { CreatePractitionerRequest } from './requests/create-practitioner.reques
 import { UsersService } from './../users/users.service';
 import {
   BadRequestException,
-  ClassSerializerInterceptor,
   Controller,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Post,
   Put,
@@ -28,6 +28,7 @@ import { UpdatePractitionerRequest } from './requests/update-practitioner.reques
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
+import { COUNTRY_CODE } from 'src/shared/country-code.dto';
 
 @Controller('/practitioners')
 export class PractitionersController {
@@ -44,9 +45,66 @@ export class PractitionersController {
     @Body() createPractitionerDto: CreatePractitionerRequest,
   ): Promise<PractitionerDto> {
     const firebaseUser = req.user as FirebaseUser;
-    const user = await this.usersService.getUserForUid(firebaseUser.uid);
+    let userId: string | null = null;
+
+    try {
+      userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw new InternalServerErrorException({
+          message: 'Something went wrong when trying to fetch the user.',
+        });
+      }
+    }
+
+    // if the user doesn't exist, create one
+    if (!userId) {
+      userId = (
+        await this.usersService.create(
+          createPractitionerDto.firstName,
+          createPractitionerDto.lastName,
+          firebaseUser.email,
+          COUNTRY_CODE.SouthAfrica,
+          firebaseUser.uid,
+          firebaseUser.picture,
+        )
+      ).id;
+    }
+
+    //TODO: This will have to be deleted later, when we allow multiple practitioners
+    // per user
+
+    const practitionerIds = await this.practitionersService.getPractitionersIdsForUserId(
+      userId,
+    );
+
+    if (practitionerIds.length != 0) {
+      // return the first found practitioner for this identity
+      const practitioner = await this.practitionersService.getPractitionerForUserId(
+        practitionerIds[0],
+        userId,
+      );
+      return new PractitionerDto({
+        ...practitioner,
+        schedules: practitioner.schedules.map(s => ({
+          daysOfWeek: [s.dayOfWeek],
+          startTime: this.mapDateToTimeString(s.startTime),
+          endTime: this.mapDateToTimeString(s.endTime),
+        })),
+        category: practitioner.category.id,
+        medicalAids: practitioner.medicalAids.map(m => m.id),
+        location: practitioner.location
+          ? {
+              latitude: practitioner.location.bbox[0],
+              longitude: practitioner.location.bbox[1],
+            }
+          : null,
+        languages: practitioner.languages.map(l => l.id),
+      });
+    }
+
     const practitioner = await this.practitionersService.createPractitioner(
-      user.id,
+      userId,
       createPractitionerDto,
     );
 

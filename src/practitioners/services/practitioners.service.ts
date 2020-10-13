@@ -35,13 +35,26 @@ export class PractitionersService {
     userId: string,
     createPractitionerDto: CreatePractitionerRequest,
   ): Promise<Practitioner> {
-    const { title, category, email, gender } = createPractitionerDto;
+    const {
+      firstName,
+      lastName,
+      category,
+      email,
+      gender,
+    } = createPractitionerDto;
+    const title = `Dr. ${firstName} ${lastName}`;
 
-    if (title.trim().length == 0) {
+    if (!firstName || firstName.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The title for the practitioner cannot be empty.',
+        message: 'The first name of the practitioner cannot be empty.',
       });
     }
+    if (!lastName || lastName.trim().length == 0) {
+      throw new BadRequestException({
+        message: 'The last name of the practitioner cannot be empty.',
+      });
+    }
+
     if (!emailValidationPattern.test(email)) {
       throw new BadRequestException({
         message: 'The email for the practitioner is invalid.',
