@@ -87,6 +87,18 @@ export class UsersService {
       countryCode,
       avatarUrl: picture,
     });
+
+    const userCustomClaims = {
+      'https://hasura.io/jwt/claims': {
+        'x-hasura-default-role': 'user',
+        'x-hasura-allowed-roles': ['user'],
+        'x-hasura-user-id': uid,
+      },
+    };
+
+    // set Hasura custom claims for access to graphQL based on role
+    await this.firebaseAdmin.auth().setCustomUserClaims(uid, userCustomClaims);
+
     try {
       return await this.userRepository.save(user);
     } catch (error) {

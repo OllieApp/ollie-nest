@@ -61,6 +61,19 @@ export class PractitionersService {
       });
     }
 
+    const userCustomClaims = {
+      'https://hasura.io/jwt/claims': {
+        'x-hasura-default-role': 'practitioner',
+        'x-hasura-allowed-roles': ['user', 'practitioner'],
+        'x-hasura-user-id': userId,
+      },
+    };
+
+    // set Hasura custom claims for access to graphQL based on role
+    await this.firebaseAdmin
+      .auth()
+      .setCustomUserClaims(userId, userCustomClaims);
+
     try {
       const newPractitioner = this.practitionerRepository.create({
         email,
