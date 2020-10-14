@@ -1,3 +1,4 @@
+import { WEEK_DAY } from './../dto/weekday.model';
 import { defaultSchedule } from './../constants';
 import PractitionerSchedule from './../entities/practitioner-schedule.entity';
 import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
@@ -85,6 +86,23 @@ export class PractitionerSchedulesService {
         message:
           'Something went wrong while trying to insert the schedule values',
         error: error,
+      });
+    }
+  }
+
+  async getSchedulesForDayOfWeek(
+    practitionerId: string,
+    dayOfWeek: WEEK_DAY,
+  ): Promise<PractitionerSchedule[]> {
+    try {
+      return (
+        (await this.schedulesRepository.find({
+          where: { dayOfWeek: dayOfWeek, practitionerId },
+        })) ?? []
+      );
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: 'Could not retrieve the schedules from the database',
       });
     }
   }

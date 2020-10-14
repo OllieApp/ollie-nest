@@ -10,9 +10,9 @@ import { AppointmentsController } from './appointments.controller';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([AppointmentStatus, Appointment]),
     UsersModule,
     PractitionersModule,
-    TypeOrmModule.forFeature([AppointmentStatus, Appointment]),
     WherebyMeetingsModule,
   ],
   controllers: [AppointmentsController],

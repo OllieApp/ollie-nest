@@ -1,3 +1,4 @@
+import { PractitionerSchedulesService } from './../practitioners/services/practitioner-schedules.service';
 import { WherebyMeetingsService } from './../integrations/whereby-meetings/whereby-meetings.service';
 import { WEEK_DAY } from './../practitioners/dto/weekday.model';
 import { CreateAppointmentRequest } from './requests/create-appointment.request';
@@ -22,16 +23,14 @@ import {
 } from 'date-fns';
 import { InjectRepository } from '@nestjs/typeorm';
 import { APPOINTMENT_STATUS } from './dto/appointment-status.dto';
-import { CreateMeetingRequest } from 'src/integrations/whereby-meetings/requests/create-meeting.request';
 
 @Injectable()
 export class AppointmentsService {
   constructor(
-    @InjectRepository(PractitionerSchedule)
-    private readonly scheduleRepository: Repository<PractitionerSchedule>,
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly wherebyService: WherebyMeetingsService,
+    private readonly practitionerSchedulesService: PractitionerSchedulesService,
   ) {}
 
   async createAppointment(
@@ -50,17 +49,12 @@ export class AppointmentsService {
     // we add +1 because sunday is 0 and we store sunday as 1
     const currentDayOfWeek = startTime.getUTCDay() + 1;
     const schedules: Array<PractitionerSchedule> = [];
-    try {
-      schedules.push(
-        ...((await this.scheduleRepository.find({
-          where: { dayOfWeek: currentDayOfWeek, practitionerId },
-        })) ?? []),
-      );
-    } catch (error) {
-      throw new InternalServerErrorException({
-        message: 'Could not retrieve the schedules from the database',
-      });
-    }
+    schedules.push(
+      ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
+        practitionerId,
+        currentDayOfWeek,
+      )),
+    );
 
     const isAppointmentBetweenScheduleTimes = (
       appointmentStart: Date,
@@ -126,17 +120,12 @@ export class AppointmentsService {
       const previousDayOfWeek: number =
         startTime.getUTCDay() === 0 ? WEEK_DAY.Saturday : startTime.getUTCDay();
       const prevDaySchedules: Array<PractitionerSchedule> = [];
-      try {
-        prevDaySchedules.push(
-          ...((await this.scheduleRepository.find({
-            where: { dayOfWeek: previousDayOfWeek, practitionerId },
-          })) ?? []),
-        );
-      } catch (error) {
-        throw new InternalServerErrorException({
-          message: 'Could not retrieve the schedules from the database',
-        });
-      }
+      prevDaySchedules.push(
+        ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
+          practitionerId,
+          previousDayOfWeek,
+        )),
+      );
       if (prevDaySchedules.length == 0) {
         throw new BadRequestException({
           message:
