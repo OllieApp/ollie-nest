@@ -111,7 +111,7 @@ export class PractitionersService {
     }
   }
 
-  async getPractitionerForUserId(
+  async getPractitionerByUserId(
     practitionerId: string,
     userId: string,
   ): Promise<Practitioner | null> {
@@ -120,6 +120,20 @@ export class PractitionersService {
         (await this.practitionerRepository.findOne({
           where: { createdBy: userId, id: practitionerId },
         })) ?? null
+      );
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: 'Something went wrong while trying to fetch the practitioner.',
+      });
+    }
+  }
+
+  async getPractitionerById(
+    practitionerId: string,
+  ): Promise<Practitioner | null> {
+    try {
+      return (
+        (await this.practitionerRepository.findOne(practitionerId)) ?? null
       );
     } catch (error) {
       throw new InternalServerErrorException({

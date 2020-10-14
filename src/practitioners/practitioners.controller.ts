@@ -80,7 +80,7 @@ export class PractitionersController {
 
     if (practitionerIds.length != 0) {
       // return the first found practitioner for this identity
-      const practitioner = await this.practitionersService.getPractitionerForUserId(
+      const practitioner = await this.practitionersService.getPractitionerByUserId(
         practitionerIds[0],
         userId,
       );
@@ -135,7 +135,7 @@ export class PractitionersController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    const practitioner = await this.practitionersService.getPractitionerForUserId(
+    const practitioner = await this.practitionersService.getPractitionerByUserId(
       practitionerId,
       userId,
     );
