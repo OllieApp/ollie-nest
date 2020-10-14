@@ -17,20 +17,20 @@ class User {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   public id: string;
 
-  @Column({ name: 'first_name', nullable: false, type: 'text', length: 150 })
+  @Column({ name: 'first_name', nullable: false, type: 'varchar', length: 150 })
   public firstName: string;
 
-  @Column({ name: 'last_name', nullable: false, type: 'text', length: 100 })
+  @Column({ name: 'last_name', nullable: false, type: 'varchar', length: 100 })
   public lastName: string;
 
-  @Column({ type: 'text', length: 150 })
+  @Column({ type: 'varchar', length: 250 })
   public email: string;
 
-  @Column({ nullable: true, type: 'text', length: 50 })
+  @Column({ nullable: true, type: 'varchar', length: 50 })
   public phone: string;
 
   @Index()
-  @Column({ unique: true, nullable: false, type: 'text', length: 200 })
+  @Column({ unique: true, nullable: false, type: 'text' })
   public uid: string;
 
   @Column({ name: 'avatar_url', nullable: true, type: 'text' })
@@ -45,7 +45,7 @@ class User {
   @Column({ nullable: true, type: 'text' })
   public city?: string;
 
-  @Column({ nullable: true, type: 'text', length: 300 })
+  @Column({ nullable: true, type: 'text' })
   public address?: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })

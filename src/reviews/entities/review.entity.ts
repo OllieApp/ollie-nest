@@ -60,10 +60,10 @@ class Review {
   })
   public overallRating: number;
 
-  @Column({ name: 'review', type: 'text', nullable: true, length: 3000 })
+  @Column({ name: 'review', type: 'varchar', nullable: true, length: 3000 })
   public review?: string;
 
-  @Column({ name: 'title', type: 'text', nullable: true, length: 200 })
+  @Column({ name: 'title', type: 'varchar', nullable: true, length: 200 })
   public title: string;
 
   @Column({
