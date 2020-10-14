@@ -1,3 +1,5 @@
+import { ReviewsModule } from './reviews/reviews.module';
+import { AppointmentsModule } from './appointments/appointments.module';
 import { PractitionersModule } from './practitioners/practitioners.module';
 import { UsersModule } from './users/users.module';
 import { Module } from '@nestjs/common';
@@ -28,6 +30,8 @@ import * as admin from 'firebase-admin';
     MedicalAidsModule,
     UsersModule,
     PractitionersModule,
+    AppointmentsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [],
