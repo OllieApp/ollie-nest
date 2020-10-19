@@ -105,6 +105,7 @@ export class PractitionersController {
 
     const practitioner = await this.practitionersService.createPractitioner(
       userId,
+      firebaseUser.uid,
       createPractitionerDto,
     );
 

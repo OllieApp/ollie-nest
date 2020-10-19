@@ -33,6 +33,7 @@ export class PractitionersService {
 
   async createPractitioner(
     userId: string,
+    userUid: string,
     createPractitionerDto: CreatePractitionerRequest,
   ): Promise<Practitioner> {
     const {
@@ -65,14 +66,14 @@ export class PractitionersService {
       'https://hasura.io/jwt/claims': {
         'x-hasura-default-role': 'practitioner',
         'x-hasura-allowed-roles': ['user', 'practitioner'],
-        'x-hasura-user-id': userId,
+        'x-hasura-user-id': userUid,
       },
     };
 
     // set Hasura custom claims for access to graphQL based on role
     await this.firebaseAdmin
       .auth()
-      .setCustomUserClaims(userId, userCustomClaims);
+      .setCustomUserClaims(userUid, userCustomClaims);
 
     try {
       const newPractitioner = this.practitionerRepository.create({
@@ -98,7 +99,6 @@ export class PractitionersService {
       return (
         (
           await this.practitionerRepository.find({
-            select: ['id'],
             where: { createdById: userId },
           })
         )?.map(p => p.id) ?? []
