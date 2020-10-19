@@ -9,11 +9,11 @@ import {
   Request,
   Post,
   Body,
-  Put,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
   Logger,
+  Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
@@ -74,7 +74,7 @@ export class UsersController {
   }
 
   // Might be a good idea to return the updated user
-  @Put()
+  @Patch()
   @UseGuards(AuthGuard('firebase'))
   async update(@Request() req, @Body() updateUserDto: UpdateUserRequest) {
     const firebaseUser = req.user as FirebaseUser;

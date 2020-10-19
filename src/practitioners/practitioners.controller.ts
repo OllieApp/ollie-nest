@@ -8,8 +8,8 @@ import {
   Get,
   InternalServerErrorException,
   NotFoundException,
+  Patch,
   Post,
-  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -180,7 +180,7 @@ export class PractitionersController {
     );
   }
 
-  @Put(':id')
+  @Patch(':id')
   @UseGuards(AuthGuard('firebase'))
   async update(
     @Request() req,
