@@ -86,13 +86,13 @@ export class PractitionersController {
       );
       return new PractitionerDto({
         ...practitioner,
-        schedules: practitioner.schedules.map(s => ({
+        schedules: practitioner.schedules?.map(s => ({
           daysOfWeek: [s.dayOfWeek],
           startTime: s.startTime,
           endTime: s.endTime,
         })),
         category: practitioner.category.id,
-        medicalAids: practitioner.medicalAids.map(m => m.id),
+        medicalAids: practitioner.medicalAids?.map(m => m.id),
         location: practitioner.location
           ? {
               latitude: practitioner.location.bbox[0],
