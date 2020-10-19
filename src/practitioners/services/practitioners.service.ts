@@ -118,7 +118,7 @@ export class PractitionersService {
     try {
       return (
         (await this.practitionerRepository.findOne({
-          where: { createdBy: userId, id: practitionerId },
+          where: { createdById: userId, id: practitionerId },
         })) ?? null
       );
     } catch (error) {
