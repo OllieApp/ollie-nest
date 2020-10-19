@@ -1,3 +1,4 @@
+import { timeFormat } from './../practitioners/constants';
 import { PractitionerSchedulesService } from './../practitioners/services/practitioner-schedules.service';
 import { WherebyMeetingsService } from './../integrations/whereby-meetings/whereby-meetings.service';
 import { WEEK_DAY } from './../practitioners/dto/weekday.model';
@@ -18,6 +19,7 @@ import {
   isAfter,
   isBefore,
   isWithinInterval,
+  parse,
   subDays,
   subHours,
 } from 'date-fns';
@@ -103,8 +105,8 @@ export class AppointmentsService {
       isAppointmentBetweenScheduleTimes(
         startTime,
         endTime,
-        s.startTime,
-        s.endTime,
+        parse(s.startTime, timeFormat, new Date()),
+        parse(s.endTime, timeFormat, new Date()),
       ),
     );
     if (!timesFitCurrentDayOfWeek) {
@@ -137,8 +139,8 @@ export class AppointmentsService {
         isAppointmentBetweenScheduleTimes(
           startTime,
           endTime,
-          s.startTime,
-          s.endTime,
+          parse(s.startTime, timeFormat, new Date()),
+          parse(s.endTime, timeFormat, new Date()),
         ),
       );
 

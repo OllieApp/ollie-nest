@@ -88,8 +88,8 @@ export class PractitionersController {
         ...practitioner,
         schedules: practitioner.schedules.map(s => ({
           daysOfWeek: [s.dayOfWeek],
-          startTime: this.mapDateToTimeString(s.startTime),
-          endTime: this.mapDateToTimeString(s.endTime),
+          startTime: s.startTime,
+          endTime: s.endTime,
         })),
         category: practitioner.category.id,
         medicalAids: practitioner.medicalAids.map(m => m.id),
@@ -120,8 +120,8 @@ export class PractitionersController {
       location: null,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
-        startTime: this.mapDateToTimeString(s.startTime),
-        endTime: this.mapDateToTimeString(s.endTime),
+        startTime: s.startTime,
+        endTime: s.endTime,
       })),
       languages: [],
     });
@@ -151,8 +151,8 @@ export class PractitionersController {
       ...practitioner,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
-        startTime: this.mapDateToTimeString(s.startTime),
-        endTime: this.mapDateToTimeString(s.endTime),
+        startTime: s.startTime,
+        endTime: s.endTime,
       })),
       category: practitioner.category.id,
       medicalAids: practitioner.medicalAids.map(m => m.id),

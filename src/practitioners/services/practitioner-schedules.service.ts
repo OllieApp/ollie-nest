@@ -1,5 +1,5 @@
 import { WEEK_DAY } from './../dto/weekday.model';
-import { defaultSchedule } from './../constants';
+import { defaultSchedule, timeFormat } from './../constants';
 import PractitionerSchedule from './../entities/practitioner-schedule.entity';
 import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 import {
@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { areIntervalsOverlapping, toDate } from 'date-fns';
+import { areIntervalsOverlapping, toDate, format, parse } from 'date-fns';
 
 @Injectable()
 export class PractitionerSchedulesService {
@@ -63,10 +63,13 @@ export class PractitionerSchedulesService {
           if (
             areIntervalsOverlapping(
               {
-                start: currentSchedule.startTime,
-                end: currentSchedule.endTime,
+                start: parse(currentSchedule.startTime, timeFormat, new Date()),
+                end: parse(currentSchedule.endTime, timeFormat, new Date()),
               },
-              { start: schedule.startTime, end: schedule.endTime },
+              {
+                start: parse(schedule.startTime, timeFormat, new Date()),
+                end: parse(schedule.endTime, timeFormat, new Date()),
+              },
             )
           ) {
             throw new UnprocessableEntityException({
@@ -122,14 +125,12 @@ export class PractitionerSchedulesService {
             );
           }
 
-          const startTime = this.parseTimeOfDayToDate(
+          const startTime = parse(
             schedule.startTime,
+            timeFormat,
             dateReference,
           );
-          const endTime = this.parseTimeOfDayToDate(
-            schedule.endTime,
-            dateReference,
-          );
+          const endTime = parse(schedule.endTime, timeFormat, dateReference);
           if (startTime > endTime) {
             throw new Error('The start time cannot be after the end time');
           }
@@ -137,33 +138,13 @@ export class PractitionerSchedulesService {
           return this.schedulesRepository.create({
             practitionerId,
             dayOfWeek,
-            startTime,
-            endTime,
+            startTime: format(startTime, timeFormat),
+            endTime: format(endTime, timeFormat),
           });
         }),
       );
     });
 
     return mappedSchedules;
-  }
-
-  private parseTimeOfDayToDate(timeOfDay: string, dateReference: Date): Date {
-    const timeParts = timeOfDay.split(':');
-    if (timeParts.length != 2) {
-      throw new Error(
-        'The time string does not contain the hour and minutes separated by colon.',
-      );
-    }
-    const hour = parseInt(timeParts[0]);
-    const minute = parseInt(timeParts[1]);
-    if (!hour || !minute) {
-      throw new Error('Was not able to parse the time');
-    }
-    const dateCopy = toDate(dateReference);
-
-    dateCopy.setHours(hour);
-    dateCopy.setMinutes(minute);
-
-    return dateCopy;
   }
 }

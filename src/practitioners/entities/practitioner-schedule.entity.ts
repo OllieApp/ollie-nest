@@ -28,14 +28,14 @@ class PractitionerSchedule {
     nullable: false,
     type: 'time with time zone',
   })
-  public startTime: Date;
+  public startTime: string;
 
   @Column({
     name: 'end_time',
     nullable: false,
     type: 'time with time zone',
   })
-  public endTime: Date;
+  public endTime: string;
 
   @ManyToOne(
     type => Practitioner,
