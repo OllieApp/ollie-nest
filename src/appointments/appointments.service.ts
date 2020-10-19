@@ -275,6 +275,7 @@ export class AppointmentsService {
 
     appointment.statusId = APPOINTMENT_STATUS.Cancelled;
     appointment.cancellationReason = cancellationReason;
+    appointment.cancellationTime = new Date();
     appointment.updatedById = userId;
     appointment.cancelledByPractitioner = cancelledByPractitioner;
     appointment.doctorVideoUrl = null;

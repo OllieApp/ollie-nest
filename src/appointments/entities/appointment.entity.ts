@@ -122,6 +122,13 @@ class Appointment {
   })
   public cancellationReason?: string;
 
+  @Column({
+    type: 'timestamp with time zone',
+    name: 'cancellation_time',
+    nullable: true,
+  })
+  public cancellationTime?: Date;
+
   @OneToOne(type => Review, { nullable: true, eager: false })
   @JoinColumn({ name: 'review_id' })
   public review?: Promise<Review>;
