@@ -24,7 +24,7 @@ import { COUNTRY_CODE } from 'src/shared/country-code.dto';
 import Review from 'src/reviews/entities/review.entity';
 
 @Entity('practitioner')
-@Check(`"consultation_pricing_range" % 100 = 0`)
+@Check(`"consultation_pricing_from" < "consultation_pricing_to"`)
 @Check(`"rating" >= 0 AND "rating" <= 5`)
 class Practitioner {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
@@ -58,12 +58,24 @@ class Practitioner {
   public appointmentTimeSlot: number;
 
   @Column({
-    name: 'consultation_pricing_range',
-    type: 'smallint',
+    name: 'consultation_pricing_from',
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
     nullable: true,
     unsigned: true,
   })
-  public consultationPricingRange: number;
+  public consultationPricingFrom?: number;
+
+  @Column({
+    name: 'consultation_pricing_to',
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+    unsigned: true,
+  })
+  public consultationPricingTo?: number;
 
   @ManyToMany(type => MedicalAid, { eager: true })
   @JoinTable({

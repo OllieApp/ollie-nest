@@ -11,7 +11,8 @@ export class UpdatePractitionerRequest {
   bio?: string;
   description?: string;
   address?: string;
-  consultationPricingRange?: number;
+  consultationPricingFrom?: number;
+  consultationPricingTo?: number;
   medicalAids?: MEDICAL_AID[];
   category?: PRACTITIONER_CATEGORY;
   location?: Location;

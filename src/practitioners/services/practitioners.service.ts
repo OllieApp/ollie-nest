@@ -156,14 +156,16 @@ export class PractitionersService {
         message: 'The email of the practitioner is invalid.',
       });
     }
-    if (
-      data.consultationPricingRange &&
-      (data.consultationPricingRange < 0 ||
-        data.consultationPricingRange % 100 != 0)
-    ) {
+    if (data.consultationPricingFrom && data.consultationPricingFrom < 0) {
       throw new BadRequestException({
         message:
-          'The consultation pricing range has to be a positive number divisible with 100.',
+          'The starting price of a consultation has to be a positive decimal number.',
+      });
+    }
+    if (data.consultationPricingTo && data.consultationPricingTo < 0) {
+      throw new BadRequestException({
+        message:
+          'The highest price of a consultation has to be a positive decimal number.',
       });
     }
 
