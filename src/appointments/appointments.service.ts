@@ -12,20 +12,10 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import {
-  addDays,
-  addMinutes,
-  areIntervalsOverlapping,
-  isAfter,
-  isBefore,
-  isWithinInterval,
-  parse,
-  subDays,
-  subHours,
-} from 'date-fns';
 import { InjectRepository } from '@nestjs/typeorm';
 import { APPOINTMENT_STATUS } from './dto/appointment-status.dto';
 import RRule, { Weekday } from 'rrule';
+import { DateTime, Interval } from 'luxon';
 
 @Injectable()
 export class AppointmentsService {
@@ -42,15 +32,18 @@ export class AppointmentsService {
     appointmentIntervalInMin: number,
   ): Promise<Appointment> {
     const { practitionerId, startTime, isVirtual, userNotes } = request;
-    const endTime = addMinutes(startTime, appointmentIntervalInMin);
-    if (isBefore(startTime, new Date())) {
+    const appointmentStartTime = DateTime.fromJSDate(startTime);
+    const appointmentEndTime = appointmentStartTime.plus({
+      minutes: appointmentIntervalInMin,
+    });
+    if (appointmentStartTime < DateTime.utc()) {
       throw new BadRequestException({
         message: 'The start time cannot be before the current time.',
       });
     }
 
     // we add +1 because sunday is 0 and we store sunday as 1
-    const appointmentDayOfWeek: WEEK_DAY = startTime.getUTCDay() + 1;
+    const appointmentDayOfWeek: WEEK_DAY = appointmentStartTime.get('weekday');
     const schedules: Array<PractitionerSchedule> = [];
     schedules.push(
       ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
@@ -60,10 +53,10 @@ export class AppointmentsService {
     );
 
     const isAppointmentBetweenScheduleTimes = (
-      appointmentStart: Date,
-      appointmentEnd: Date,
-      scheduleStart: Date,
-      scheduleEnd: Date,
+      appointmentStart: DateTime,
+      appointmentEnd: DateTime,
+      scheduleStart: DateTime,
+      scheduleEnd: DateTime,
       appointmentDayOfWeek: WEEK_DAY,
     ): boolean => {
       const rule = this.getRruleForSchedule(
@@ -73,29 +66,21 @@ export class AppointmentsService {
       );
 
       return (
-        rule.all().findIndex(sStart => {
-          const sEnd = addMinutes(
-            sStart,
-            this.calculateMinuteDifferenceBetweenTimes(
-              { hour: sStart.getHours(), minute: sStart.getMinutes() },
+        rule.all().findIndex(generatedScheduleStart => {
+          const sStart = DateTime.fromJSDate(generatedScheduleStart);
+          const sEnd = sStart.plus({
+            minutes: this.calculateMinuteDifferenceBetweenTimes(
+              { hour: sStart.get('hour'), minute: sStart.get('minute') },
               {
-                hour: scheduleEnd.getHours(),
-                minute: scheduleEnd.getMinutes(),
+                hour: scheduleEnd.get('hour'),
+                minute: scheduleEnd.get('minute'),
               },
             ),
-          );
-          const scheduleInterval = {
-            start: sStart,
-            end: sEnd,
-          };
+          });
+          const scheduleInterval = Interval.fromDateTimes(sStart, sEnd);
           if (
-            isWithinInterval(appointmentStart, scheduleInterval) &&
-            isWithinInterval(appointmentEnd, scheduleInterval) &&
-            areIntervalsOverlapping(
-              { start: appointmentStart, end: appointmentEnd },
-              { start: sStart, end: sEnd },
-              { inclusive: true },
-            )
+            scheduleInterval.contains(appointmentStart) &&
+            scheduleInterval.contains(appointmentEnd)
           ) {
             return true;
           }
@@ -107,10 +92,10 @@ export class AppointmentsService {
     // check if the found schedules for the selected
     const timesFitCurrentDayOfWeek = schedules.find(s =>
       isAppointmentBetweenScheduleTimes(
-        startTime,
-        endTime,
-        parse(s.startTime, timeFormat, new Date()),
-        parse(s.endTime, timeFormat, new Date()),
+        appointmentStartTime,
+        appointmentEndTime,
+        DateTime.fromISO(s.startTime).set({ weekday: appointmentDayOfWeek }),
+        DateTime.fromISO(s.endTime).set({ weekday: appointmentDayOfWeek }),
         appointmentDayOfWeek,
       ),
     );
@@ -118,14 +103,10 @@ export class AppointmentsService {
       // we check here if the start and end time of the appointment
       // might fit into the previous day of the week
 
-      // we start with Sunday, and Sunday is represented by 0 in DateTime in JS, so if it is a Sunday,
-      // then the previous day is a Saturday, which is a 7 or WEEK_DAY.Saturday in our representation.
-      // if it is not a Sunday, then we keep the same numbering without adding or substracting, because in
-      // DateTime in JS, day of week numbering starts from 0, so if a 1 is a Monday in JS, a 1 in our
-      // representation will be a Sunday, a 2 in DateTime JS will be a Tuesday, and Monday in our representation
-      // and so on..
       const previousDayOfWeek: WEEK_DAY =
-        appointmentDayOfWeek === 0 ? WEEK_DAY.Saturday : appointmentDayOfWeek;
+        appointmentDayOfWeek === WEEK_DAY.Monday
+          ? WEEK_DAY.Sunday
+          : appointmentDayOfWeek - 1;
       const prevDaySchedules: Array<PractitionerSchedule> = [];
       prevDaySchedules.push(
         ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
@@ -142,10 +123,10 @@ export class AppointmentsService {
       // check if the found schedules for the selected
       const timesFitPreviousDayOfWeek = schedules.find(s =>
         isAppointmentBetweenScheduleTimes(
-          startTime,
-          endTime,
-          parse(s.startTime, timeFormat, new Date()),
-          parse(s.endTime, timeFormat, new Date()),
+          appointmentStartTime,
+          appointmentEndTime,
+          DateTime.fromISO(s.startTime).set({ weekday: previousDayOfWeek }),
+          DateTime.fromISO(s.endTime).set({ weekday: previousDayOfWeek }),
           previousDayOfWeek,
         ),
       );
@@ -166,8 +147,8 @@ export class AppointmentsService {
         .where(
           "tstzrange(ap.start_time::timestamptz, ap.end_time::timestamptz, '()') && tstzrange(:appointmentStart::timestamptz, :appointmentEnd::timestamptz, '()')",
           {
-            appointmentStart: startTime.toISOString(),
-            appointmentEnd: endTime.toISOString(),
+            appointmentStart: appointmentStartTime.toISO(),
+            appointmentEnd: appointmentEndTime.toISO(),
           },
         )
         .andWhere('ap.practitioner_id = :practitionerId', {
@@ -180,10 +161,10 @@ export class AppointmentsService {
           statusId: APPOINTMENT_STATUS.Pending as number,
         })
         .andWhere('ap.start_time >= :appointmentStart::timestamptz', {
-          currentDate: subDays(startTime, 1).toISOString(),
+          currentDate: appointmentStartTime.plus({ days: -1 }).toISO(),
         })
         .andWhere('ap.start_time <= :currentDate::timestamptz', {
-          currentDate: addDays(endTime, 1).toISOString(),
+          currentDate: appointmentEndTime.plus({ days: 1 }).toISO(),
         })
         .limit(1)
         .getOne();
@@ -203,7 +184,7 @@ export class AppointmentsService {
 
     let newAppointment = this.appointmentRepository.create({
       startTime,
-      endTime,
+      endTime: appointmentEndTime,
       practitionerId,
       isVirtual,
       userNotes,
@@ -265,7 +246,10 @@ export class AppointmentsService {
       });
     }
 
-    if (isAfter(new Date(), subHours(appointment.startTime, 2))) {
+    if (
+      DateTime.utc() >
+      DateTime.fromJSDate(appointment.startTime).plus({ hours: -2 })
+    ) {
       throw new UnprocessableEntityException({
         message:
           'Cannot cancel an appointment later than 2 hours before the appointment.',
@@ -345,18 +329,21 @@ export class AppointmentsService {
 
   private getRruleForSchedule(
     appointmentDayOfWeek: WEEK_DAY,
-    scheduleStart: Date,
-    appointmentStart: Date,
+    scheduleStart: DateTime,
+    appointmentStart: DateTime,
   ): RRule {
     return new RRule({
       freq: RRule.WEEKLY,
-      dtstart: appointmentStart,
+      dtstart: appointmentStart
+        .startOf('day')
+        .plus({ days: -1 })
+        .toJSDate(),
       count: 1,
       interval: 1,
       wkst: RRule.SU,
       byweekday: this.mapdayOfWeekToRruleWeekday(appointmentDayOfWeek),
-      byhour: [scheduleStart.getHours()],
-      byminute: [scheduleStart.getMinutes()],
+      byhour: [scheduleStart.get('hour')],
+      byminute: [scheduleStart.get('minute')],
     });
   }
 

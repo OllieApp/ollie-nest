@@ -1,5 +1,4 @@
 import { PractitionerIdsForUser } from './dto/practitioner-for-user.dto';
-import { timeFormat } from './constants';
 import { CreatePractitionerRequest } from './requests/create-practitioner.request';
 import { UsersService } from './../users/users.service';
 import {
@@ -23,7 +22,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { PractitionerDto } from './dto/practitioner.dto';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-admin';
 import { PractitionerSchedulesService } from './services/practitioner-schedules.service';
-import { format } from 'date-fns';
 import { UpdatePractitionerRequest } from './requests/update-practitioner.request';
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
@@ -254,9 +252,5 @@ export class PractitionersController {
       practitionerId,
       file.mimetype,
     );
-  }
-
-  private mapDateToTimeString(date: Date): string {
-    return format(date, timeFormat);
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { areIntervalsOverlapping, toDate, format, parse } from 'date-fns';
+import { DateTime, Interval, Zone } from 'luxon';
 
 @Injectable()
 export class PractitionerSchedulesService {
@@ -54,24 +54,22 @@ export class PractitionerSchedulesService {
       // as there will be nothing to compare with for the last element
       for (let index = 0; index < schedules.length - 1; index++) {
         const currentSchedule = schedules[index];
+        const currentScheduleInterval = Interval.fromDateTimes(
+          DateTime.fromISO(currentSchedule.startTime),
+          DateTime.fromISO(currentSchedule.endTime),
+        );
         const restOfSchedules = schedules.slice(index, length);
         restOfSchedules.forEach(schedule => {
           if (schedule.dayOfWeek != currentSchedule.dayOfWeek) {
             return;
           }
 
-          if (
-            areIntervalsOverlapping(
-              {
-                start: parse(currentSchedule.startTime, timeFormat, new Date()),
-                end: parse(currentSchedule.endTime, timeFormat, new Date()),
-              },
-              {
-                start: parse(schedule.startTime, timeFormat, new Date()),
-                end: parse(schedule.endTime, timeFormat, new Date()),
-              },
-            )
-          ) {
+          const selectedScheduleInteval = Interval.fromDateTimes(
+            DateTime.fromISO(schedule.startTime),
+            DateTime.fromISO(schedule.endTime),
+          );
+
+          if (currentScheduleInterval.overlaps(selectedScheduleInteval)) {
             throw new UnprocessableEntityException({
               message:
                 'In the schedule collection times for the same day cannot overlap.',
@@ -79,6 +77,8 @@ export class PractitionerSchedulesService {
           }
         });
       }
+
+      // remove previous schedules
       await this.schedulesRepository.delete({
         practitionerId,
       });
@@ -125,12 +125,8 @@ export class PractitionerSchedulesService {
             );
           }
 
-          const startTime = parse(
-            schedule.startTime,
-            timeFormat,
-            dateReference,
-          );
-          const endTime = parse(schedule.endTime, timeFormat, dateReference);
+          const startTime = DateTime.fromISO(schedule.startTime);
+          const endTime = DateTime.fromISO(schedule.endTime);
           if (startTime > endTime) {
             throw new Error('The start time cannot be after the end time');
           }
@@ -138,8 +134,8 @@ export class PractitionerSchedulesService {
           return this.schedulesRepository.create({
             practitionerId,
             dayOfWeek,
-            startTime: format(startTime, timeFormat),
-            endTime: format(endTime, timeFormat),
+            startTime: startTime.toFormat(timeFormat),
+            endTime: endTime.toFormat(timeFormat),
           });
         }),
       );
