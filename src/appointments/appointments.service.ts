@@ -50,7 +50,7 @@ export class AppointmentsService {
     }
 
     // we add +1 because sunday is 0 and we store sunday as 1
-    const appointmentDayOfWeek = startTime.getUTCDay() + 1;
+    const appointmentDayOfWeek: WEEK_DAY = startTime.getUTCDay() + 1;
     const schedules: Array<PractitionerSchedule> = [];
     schedules.push(
       ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
@@ -124,10 +124,8 @@ export class AppointmentsService {
       // DateTime in JS, day of week numbering starts from 0, so if a 1 is a Monday in JS, a 1 in our
       // representation will be a Sunday, a 2 in DateTime JS will be a Tuesday, and Monday in our representation
       // and so on..
-      const previousDayOfWeek: number =
-        appointmentDayOfWeek === 0
-          ? WEEK_DAY.Saturday
-          : appointmentDayOfWeek - 1;
+      const previousDayOfWeek: WEEK_DAY =
+        appointmentDayOfWeek === 0 ? WEEK_DAY.Saturday : appointmentDayOfWeek;
       const prevDaySchedules: Array<PractitionerSchedule> = [];
       prevDaySchedules.push(
         ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
