@@ -24,6 +24,7 @@ class Appointment {
     practitioner => practitioner.appointments,
     {
       nullable: false,
+      eager: false,
     },
   )
   @JoinColumn({ name: 'practitioner_id' })
@@ -37,6 +38,7 @@ class Appointment {
     user => user.appointments,
     {
       nullable: false,
+      eager: false,
     },
   )
   @JoinColumn({ name: 'user_id' })

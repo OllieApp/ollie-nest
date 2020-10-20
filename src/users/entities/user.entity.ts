@@ -114,6 +114,13 @@ class User {
   public appointments: Promise<Appointment[]>;
 
   @OneToMany(
+    type => Appointment,
+    appointment => appointment.updatedBy,
+    { eager: false },
+  )
+  public updatedAppointments: Promise<Appointment[]>;
+
+  @OneToMany(
     type => Review,
     review => review.user,
     { eager: false },

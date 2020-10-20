@@ -1,4 +1,3 @@
-import { timeFormat } from './../practitioners/constants';
 import { PractitionerSchedulesService } from './../practitioners/services/practitioner-schedules.service';
 import { WherebyMeetingsService } from './../integrations/whereby-meetings/whereby-meetings.service';
 import { WEEK_DAY } from './../practitioners/dto/weekday.model';
@@ -183,8 +182,8 @@ export class AppointmentsService {
     }
 
     let newAppointment = this.appointmentRepository.create({
-      startTime: appointmentStartTime.toJSDate(),
-      endTime: appointmentEndTime.toJSDate(),
+      startTime: appointmentStartTime.toUTC().toJSDate(),
+      endTime: appointmentEndTime.toUTC().toJSDate(),
       practitionerId,
       isVirtual,
       userNotes,
