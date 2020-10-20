@@ -1,5 +1,5 @@
+import { IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsDate } from 'class-validator/types/decorator/typechecker/IsDate';
 
 export class CreateAppointmentRequest {
   public practitionerId: string;
