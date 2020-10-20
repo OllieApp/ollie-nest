@@ -183,8 +183,8 @@ export class AppointmentsService {
     }
 
     let newAppointment = this.appointmentRepository.create({
-      startTime,
-      endTime: appointmentEndTime,
+      startTime: appointmentStartTime.toJSDate(),
+      endTime: appointmentEndTime.toJSDate(),
       practitionerId,
       isVirtual,
       userNotes,
