@@ -25,6 +25,7 @@ import {
 } from 'date-fns';
 import { InjectRepository } from '@nestjs/typeorm';
 import { APPOINTMENT_STATUS } from './dto/appointment-status.dto';
+import RRule, { Weekday } from 'rrule';
 
 @Injectable()
 export class AppointmentsService {
@@ -49,12 +50,12 @@ export class AppointmentsService {
     }
 
     // we add +1 because sunday is 0 and we store sunday as 1
-    const currentDayOfWeek = startTime.getUTCDay() + 1;
+    const appointmentDayOfWeek = startTime.getUTCDay() + 1;
     const schedules: Array<PractitionerSchedule> = [];
     schedules.push(
       ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
         practitionerId,
-        currentDayOfWeek,
+        appointmentDayOfWeek,
       )),
     );
 
@@ -63,50 +64,54 @@ export class AppointmentsService {
       appointmentEnd: Date,
       scheduleStart: Date,
       scheduleEnd: Date,
+      appointmentDayOfWeek: WEEK_DAY,
     ): boolean => {
-      const sStart = new Date(
-        appointmentStart.getUTCFullYear(),
-        appointmentStart.getUTCMonth(),
-        appointmentStart.getUTCDate(),
-        scheduleStart.getUTCHours(),
-        scheduleStart.getUTCMinutes(),
-      );
-      const sEnd = addMinutes(
-        sStart,
-        this.calculateMinuteDifferenceBetweenTimes(
-          { hour: sStart.getUTCHours(), minute: sStart.getUTCMinutes() },
-          {
-            hour: scheduleEnd.getUTCHours(),
-            minute: scheduleEnd.getUTCMinutes(),
-          },
-        ),
+      const rule = this.getRruleForSchedule(
+        appointmentDayOfWeek,
+        scheduleStart,
+        appointmentStart,
       );
 
-      const scheduleInterval = {
-        start: sStart,
-        end: sEnd,
-      };
-      if (
-        isWithinInterval(appointmentStart, scheduleInterval) &&
-        isWithinInterval(appointmentEnd, scheduleInterval) &&
-        areIntervalsOverlapping(
-          { start: appointmentStart, end: appointmentEnd },
-          { start: sStart, end: sEnd },
-          { inclusive: true },
-        )
-      ) {
-        return true;
-      }
-      return false;
+      return (
+        rule.all().findIndex(sStart => {
+          const sEnd = addMinutes(
+            sStart,
+            this.calculateMinuteDifferenceBetweenTimes(
+              { hour: sStart.getHours(), minute: sStart.getMinutes() },
+              {
+                hour: scheduleEnd.getHours(),
+                minute: scheduleEnd.getMinutes(),
+              },
+            ),
+          );
+          const scheduleInterval = {
+            start: sStart,
+            end: sEnd,
+          };
+          if (
+            isWithinInterval(appointmentStart, scheduleInterval) &&
+            isWithinInterval(appointmentEnd, scheduleInterval) &&
+            areIntervalsOverlapping(
+              { start: appointmentStart, end: appointmentEnd },
+              { start: sStart, end: sEnd },
+              { inclusive: true },
+            )
+          ) {
+            return true;
+          }
+          return false;
+        }) != -1
+      );
     };
 
     // check if the found schedules for the selected
-    const timesFitCurrentDayOfWeek = schedules.some(s =>
+    const timesFitCurrentDayOfWeek = schedules.find(s =>
       isAppointmentBetweenScheduleTimes(
         startTime,
         endTime,
         parse(s.startTime, timeFormat, new Date()),
         parse(s.endTime, timeFormat, new Date()),
+        appointmentDayOfWeek,
       ),
     );
     if (!timesFitCurrentDayOfWeek) {
@@ -120,7 +125,9 @@ export class AppointmentsService {
       // representation will be a Sunday, a 2 in DateTime JS will be a Tuesday, and Monday in our representation
       // and so on..
       const previousDayOfWeek: number =
-        startTime.getUTCDay() === 0 ? WEEK_DAY.Saturday : startTime.getUTCDay();
+        appointmentDayOfWeek === 0
+          ? WEEK_DAY.Saturday
+          : appointmentDayOfWeek - 1;
       const prevDaySchedules: Array<PractitionerSchedule> = [];
       prevDaySchedules.push(
         ...(await this.practitionerSchedulesService.getSchedulesForDayOfWeek(
@@ -135,12 +142,13 @@ export class AppointmentsService {
         });
       }
       // check if the found schedules for the selected
-      const timesFitPreviousDayOfWeek = schedules.some(s =>
+      const timesFitPreviousDayOfWeek = schedules.find(s =>
         isAppointmentBetweenScheduleTimes(
           startTime,
           endTime,
           parse(s.startTime, timeFormat, new Date()),
           parse(s.endTime, timeFormat, new Date()),
+          previousDayOfWeek,
         ),
       );
 
@@ -335,6 +343,44 @@ export class AppointmentsService {
       }
     }
     return minutes;
+  }
+
+  private getRruleForSchedule(
+    appointmentDayOfWeek: WEEK_DAY,
+    scheduleStart: Date,
+    appointmentStart: Date,
+  ): RRule {
+    return new RRule({
+      freq: RRule.WEEKLY,
+      dtstart: appointmentStart,
+      count: 1,
+      interval: 1,
+      wkst: RRule.SU,
+      byweekday: this.mapdayOfWeekToRruleWeekday(appointmentDayOfWeek),
+      byhour: [scheduleStart.getHours()],
+      byminute: [scheduleStart.getMinutes()],
+    });
+  }
+
+  private mapdayOfWeekToRruleWeekday(dayOfWeek: WEEK_DAY): Weekday {
+    switch (dayOfWeek) {
+      case WEEK_DAY.Monday:
+        return RRule.MO;
+      case WEEK_DAY.Tuesday:
+        return RRule.TU;
+      case WEEK_DAY.Wednesday:
+        return RRule.WE;
+      case WEEK_DAY.Thursday:
+        return RRule.TH;
+      case WEEK_DAY.Friday:
+        return RRule.FR;
+      case WEEK_DAY.Saturday:
+        return RRule.SA;
+      case WEEK_DAY.Sunday:
+        return RRule.SU;
+      default:
+        return RRule.MO;
+    }
   }
 }
 
