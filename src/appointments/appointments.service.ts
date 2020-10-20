@@ -31,7 +31,9 @@ export class AppointmentsService {
     appointmentIntervalInMin: number,
   ): Promise<Appointment> {
     const { practitionerId, startTime, isVirtual, userNotes } = request;
-    const appointmentStartTime = DateTime.fromJSDate(startTime);
+    const appointmentStartTime = DateTime.fromJSDate(startTime).set({
+      millisecond: 0,
+    });
     const appointmentEndTime = appointmentStartTime.plus({
       minutes: appointmentIntervalInMin,
     });
