@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import admin from 'firebase-admin';
 import * as rateLimit from 'express-rate-limit';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder } from '@nestjs/swagger/dist/document-builder';
 import { SwaggerModule } from '@nestjs/swagger/dist/swagger-module';
 
@@ -28,6 +28,11 @@ async function bootstrap() {
     rateLimit({
       windowMs: 10 * 60 * 1000, // 10 minutes
       max: 120, // limit each IP to 100 requests per windowMs
+    }),
+  );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
     }),
   );
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));

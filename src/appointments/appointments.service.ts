@@ -42,7 +42,7 @@ export class AppointmentsService {
   ): Promise<Appointment> {
     const { practitionerId, startTime, isVirtual, userNotes } = request;
     const endTime = addMinutes(startTime, appointmentIntervalInMin);
-    if (isBefore(request.startTime, new Date())) {
+    if (isBefore(startTime, new Date())) {
       throw new BadRequestException({
         message: 'The start time cannot be before the current time.',
       });
