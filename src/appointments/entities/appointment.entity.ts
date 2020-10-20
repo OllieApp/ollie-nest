@@ -61,7 +61,14 @@ class Appointment {
   })
   public updatedAt: Date;
 
-  @OneToOne(type => User, { nullable: false, eager: false })
+  @ManyToOne(
+    type => User,
+    user => user.updatedAppointments,
+    {
+      nullable: false,
+      eager: false,
+    },
+  )
   @JoinColumn({ name: 'updated_by' })
   public updatedBy: Promise<User>;
 
