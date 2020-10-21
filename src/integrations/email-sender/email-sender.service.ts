@@ -1,4 +1,4 @@
-import { ollieNoReply } from './constants';
+import { ollieSendFrom, welcomeEmailTemplateId } from './constants';
 import { Injectable } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 
@@ -9,11 +9,10 @@ export class EmailSenderService {
   ) {}
 
   async sendWelcomeEmail(userEmail: string) {
-    const templateId = '213123';
     await this.sendgrid.send({
       to: userEmail,
-      from: ollieNoReply,
-      templateId,
+      from: ollieSendFrom,
+      templateId: welcomeEmailTemplateId,
       dynamicTemplateData: {},
     });
   }
