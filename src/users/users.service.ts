@@ -18,6 +18,7 @@ import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from './entities/user.entity';
 import { emailValidationPattern } from 'src/constants';
+import { EmailSenderService } from 'src/integrations/email-sender/email-sender.service';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,7 @@ export class UsersService {
     @Inject(FIREBASE_ADMIN_INJECT) private firebaseAdmin: FirebaseAdminSDK,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly emailService: EmailSenderService,
   ) {}
   async create(
     firstName: string,
@@ -100,7 +102,9 @@ export class UsersService {
     await this.firebaseAdmin.auth().setCustomUserClaims(uid, userCustomClaims);
 
     try {
-      return await this.userRepository.save(user);
+      user = await this.userRepository.save(user);
+      this.emailService.sendWelcomeEmail(email);
+      return user;
     } catch (error) {
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
