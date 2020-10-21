@@ -33,6 +33,7 @@ export class AppointmentsService {
     const { practitionerId, startTime, isVirtual, userNotes } = request;
     const appointmentStartTime = DateTime.fromJSDate(startTime).set({
       millisecond: 0,
+      second: 0,
     });
     const appointmentEndTime = appointmentStartTime.plus({
       minutes: appointmentIntervalInMin,
@@ -232,9 +233,10 @@ export class AppointmentsService {
     cancelledByPractitioner: boolean,
     cancellationReason: string,
   ) {
-    if (cancellationReason.trim().length != 50) {
+    if (!cancellationReason || cancellationReason.trim().length < 40) {
       throw new BadRequestException({
-        message: 'The cancellation reason cannot be empty.',
+        message:
+          'The cancellation reason can not be empty or contain less than 40 characters.',
       });
     }
 
