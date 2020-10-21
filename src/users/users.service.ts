@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -28,6 +29,8 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
     private readonly emailService: EmailSenderService,
   ) {}
+  private readonly logger = new Logger(UsersService.name);
+
   async create(
     firstName: string,
     lastName: string,
@@ -44,6 +47,10 @@ export class UsersService {
         .where('user.uid = :uid', { uid })
         .getOne();
     } catch (error) {
+      this.logger.error(
+        'Something went wrong while checking for any existing users with this identity.',
+        error,
+      );
       throw new InternalServerErrorException({
         message:
           'Something went wrong while checking for any existing users with this identity.',
@@ -103,13 +110,25 @@ export class UsersService {
 
     try {
       user = await this.userRepository.save(user);
-      this.emailService.sendWelcomeEmail(email);
-      return user;
     } catch (error) {
+      this.logger.error(
+        'Something went wrong while trying to save the user',
+        error,
+      );
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
       });
     }
+
+    try {
+      this.emailService.sendWelcomeEmail(email);
+    } catch (error) {
+      this.logger.error(
+        'Something went wrong while trying to send the welcome email to the user.',
+        error,
+      );
+    }
+    return user;
   }
 
   async update(updatedUser: UpdateUserRequest, uid: string) {
@@ -177,6 +196,10 @@ export class UsersService {
         });
       }
     } catch (error) {
+      this.logger.error(
+        'Something went wrong while trying to update the user.',
+        error,
+      );
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to execute the operation.',
       });
@@ -221,16 +244,25 @@ export class UsersService {
     try {
       await bucket.deleteFiles({ prefix: fileName, force: true });
     } catch (error) {
-      //Log this at a later point
+      this.logger.error(
+        'Something went wrong while trying to clean up the other avatars of the user.',
+        error,
+      );
     }
 
     const file = bucket.file(`${fileName}_${Date.now()}`);
-    await file.save(dataBuffer.buffer, {
-      gzip: true,
-      contentType: fileType,
-      public: true,
-    });
-
+    try {
+      await file.save(dataBuffer.buffer, {
+        gzip: true,
+        contentType: fileType,
+        public: true,
+      });
+    } catch (error) {
+      this.logger.error(
+        'Something went wrong while trying to save the avatar of the user.',
+        error,
+      );
+    }
     const url = (
       await file.getSignedUrl({
         expires: new Date(2999, 12, 31),
