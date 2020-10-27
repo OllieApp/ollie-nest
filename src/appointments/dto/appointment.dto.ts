@@ -13,6 +13,7 @@ export class AppointmentDto {
   public cancellationReason?: string;
   public reviewId?: string;
   public videoUrl?: string;
+  public cancellationTime?: Date;
 
   constructor(partial: Partial<AppointmentDto>) {
     Object.assign(this, partial);

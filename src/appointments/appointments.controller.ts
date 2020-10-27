@@ -42,7 +42,19 @@ export class AppointmentsController {
       createAppointmentRequest,
       appointmentTimeSlot,
     );
-    return new AppointmentDto({ ...appointment, status: appointment.statusId });
+    return new AppointmentDto({
+      id: appointment.id,
+      practitionerId: appointment.practitionerId,
+      reviewId: appointment.reviewId,
+      userId: appointment.userId,
+      startTime: appointment.startTime,
+      endTime: appointment.endTime,
+      isVirtual: appointment.isVirtual,
+      createdAt: appointment.createdAt,
+      userNotes: appointment.userNotes,
+      videoUrl: appointment.userVideoUrl,
+      status: appointment.statusId,
+    });
   }
 
   @Post('/:id/cancel')
