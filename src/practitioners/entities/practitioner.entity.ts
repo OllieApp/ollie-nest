@@ -79,7 +79,7 @@ class Practitioner {
 
   @ManyToMany(type => MedicalAid, { eager: true })
   @JoinTable({
-    name: 'practitioner_medical_aids',
+    name: 'practitioner_medical_aid',
     joinColumn: {
       name: 'practitioner_id',
       referencedColumnName: 'id',
@@ -170,7 +170,7 @@ class Practitioner {
 
   @ManyToMany(type => Language, { nullable: false, eager: true })
   @JoinTable({
-    name: 'practitioner_languages',
+    name: 'practitioner_language',
     joinColumn: {
       name: 'practitioner_id',
       referencedColumnName: 'id',

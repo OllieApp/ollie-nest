@@ -1,3 +1,4 @@
+import Practitioner from 'src/practitioners/entities/practitioner.entity';
 import Appointment from '../../appointments/entities/appointment.entity';
 import Review from 'src/reviews/entities/review.entity';
 import {
@@ -9,6 +10,8 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
 
@@ -126,6 +129,21 @@ class User {
     { eager: false },
   )
   public reviews: Promise<Review[]>;
+
+  @ManyToMany(type => Practitioner, { eager: false })
+  @JoinTable({
+    name: 'user_favorite_practitioner',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'practitioner_id',
+      referencedColumnName: 'id',
+    },
+  })
+  @JoinColumn({ name: 'practitioner_id' })
+  public favoritePractitioners: Promise<Practitioner[]>;
 }
 
 export default User;
