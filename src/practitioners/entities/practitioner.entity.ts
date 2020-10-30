@@ -106,7 +106,11 @@ class Practitioner {
   @Column({ name: 'category_id' })
   public categoryId: number;
 
-  @OneToOne(type => User, { nullable: false, eager: false })
+  @ManyToOne(
+    type => User,
+    user => user.createdPractitioners,
+    { nullable: false, eager: false },
+  )
   @JoinColumn({ name: 'created_by' })
   public createdBy: Promise<User>;
 

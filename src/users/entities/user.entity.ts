@@ -144,6 +144,13 @@ class User {
   })
   @JoinColumn({ name: 'practitioner_id' })
   public favoritePractitioners: Promise<Practitioner[]>;
+
+  @OneToMany(
+    type => Practitioner,
+    practitioner => practitioner.createdBy,
+    { nullable: false, eager: false },
+  )
+  public createdPractitioners: Promise<Practitioner[]>;
 }
 
 export default User;
