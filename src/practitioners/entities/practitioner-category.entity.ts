@@ -12,6 +12,7 @@ export class PractitionerCategory {
   @OneToMany(
     type => Practitioner,
     practitioner => practitioner.category,
+    { eager: false },
   )
-  practitioners: Promise<Practitioner[]>;
+  public practitioners: Promise<Practitioner[]>;
 }
