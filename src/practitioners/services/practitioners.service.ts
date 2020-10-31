@@ -21,7 +21,6 @@ import {
 } from '@tfarras/nestjs-firebase-admin';
 import * as crypto from 'crypto';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { Language } from '../entities/language.entity';
 
 @Injectable()
 export class PractitionersService {

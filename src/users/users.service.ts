@@ -1,3 +1,4 @@
+import Practitioner from 'src/practitioners/entities/practitioner.entity';
 import { FIREBASE_STORAGE_USERS_AVATARS_BUCKET } from './constants';
 import { UpdateUserRequest } from './requests/update-user.request';
 import {
@@ -321,5 +322,51 @@ export class UsersService {
   async getUserIdForUid(uid: string): Promise<string> {
     const user = await this.getUserForUid(uid);
     return user.id;
+  }
+
+  async addPractitionerToFavorites(userId: string, practitionerId: string) {
+    try {
+      const user = await this.userRepository.findOne(userId);
+      const practitioners = await user.favoritePractitioners;
+      if (practitioners.length >= 25) {
+        throw new BadRequestException({
+          message:
+            'The limit for favorite practitioners has already been reached.',
+        });
+      }
+      const practitioner = new Practitioner();
+      practitioner.id = practitionerId;
+      practitioners.push(practitioner);
+      this.userRepository.update(userId, {
+        favoritePractitioners: Promise.resolve(practitioners),
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: "Could not add the practitioner to user's favorites.",
+      });
+    }
+  }
+
+  async removePractitionerFromFavorites(
+    userId: string,
+    practitionerId: string,
+  ) {
+    try {
+      const user = await this.userRepository.findOne(userId);
+      const practitioners = await user.favoritePractitioners;
+      if (practitioners.length == 0) {
+        return;
+      }
+      const filteredPractitioners = practitioners.filter(
+        p => p.id !== practitionerId,
+      );
+      this.userRepository.update(userId, {
+        favoritePractitioners: Promise.resolve(filteredPractitioners),
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: "Could not remove the practitioner from user's favorites.",
+      });
+    }
   }
 }

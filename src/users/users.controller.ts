@@ -14,6 +14,10 @@ import {
   BadRequestException,
   Logger,
   Patch,
+  Param,
+  UnauthorizedException,
+  ForbiddenException,
+  Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
@@ -113,6 +117,43 @@ export class UsersController {
       file,
       firebaseUser.uid,
       file.mimetype,
+    );
+  }
+
+  @Post('/:userId/favorite-practitioners/:practitionerId')
+  @UseGuards(AuthGuard('firebase'))
+  async addFavoritePractitioner(
+    @Request() req,
+    @Param('userId') userId: string,
+    @Param('practitionerId') practitionerId: string,
+  ) {
+    const firebaseUser = req.user as FirebaseUser;
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
+    if (user.id != userId) {
+      throw new ForbiddenException({
+        message: 'Cannot add favorites to this user.',
+      });
+    }
+    await this.usersService.addPractitionerToFavorites(user.id, practitionerId);
+  }
+
+  @Delete('/:userId/favorite-practitioners/:practitionerId')
+  @UseGuards(AuthGuard('firebase'))
+  async removeFavoritePractitioner(
+    @Request() req,
+    @Param('userId') userId: string,
+    @Param('practitionerId') practitionerId: string,
+  ) {
+    const firebaseUser = req.user as FirebaseUser;
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
+    if (user.id != userId) {
+      throw new ForbiddenException({
+        message: 'Cannot add favorites to this user.',
+      });
+    }
+    await this.usersService.removePractitionerFromFavorites(
+      user.id,
+      practitionerId,
     );
   }
 }
