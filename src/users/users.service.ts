@@ -337,7 +337,7 @@ export class UsersService {
       const practitioner = new Practitioner();
       practitioner.id = practitionerId;
       practitioners.push(practitioner);
-      this.userRepository.update(userId, {
+      await this.userRepository.update(user, {
         favoritePractitioners: Promise.resolve(practitioners),
       });
     } catch (error) {
@@ -360,7 +360,7 @@ export class UsersService {
       const filteredPractitioners = practitioners.filter(
         p => p.id !== practitionerId,
       );
-      this.userRepository.update(userId, {
+      await this.userRepository.update(user, {
         favoritePractitioners: Promise.resolve(filteredPractitioners),
       });
     } catch (error) {
