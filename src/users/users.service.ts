@@ -334,12 +334,13 @@ export class UsersService {
             'The limit for favorite practitioners has already been reached.',
         });
       }
-      const practitioner = new Practitioner();
-      practitioner.id = practitionerId;
-      practitioners.push(practitioner);
-      await this.userRepository.update(user, {
-        favoritePractitioners: Promise.resolve(practitioners),
-      });
+      const favPractitioner = new Practitioner();
+      favPractitioner.id = practitionerId;
+      user.favoritePractitioners = Promise.resolve([
+        ...practitioners,
+        favPractitioner,
+      ]);
+      await this.userRepository.save(user);
     } catch (error) {
       throw new InternalServerErrorException({
         message: "Could not add the practitioner to user's favorites.",
@@ -360,9 +361,8 @@ export class UsersService {
       const filteredPractitioners = practitioners.filter(
         p => p.id !== practitionerId,
       );
-      await this.userRepository.update(user, {
-        favoritePractitioners: Promise.resolve(filteredPractitioners),
-      });
+      user.favoritePractitioners = Promise.resolve(filteredPractitioners);
+      await this.userRepository.save(user);
     } catch (error) {
       throw new InternalServerErrorException({
         message: "Could not remove the practitioner from user's favorites.",
