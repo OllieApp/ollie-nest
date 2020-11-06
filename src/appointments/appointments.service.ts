@@ -79,10 +79,12 @@ export class AppointmentsService {
             ),
           });
           const scheduleInterval = Interval.fromDateTimes(sStart, sEnd);
+
           if (
             scheduleInterval.contains(appointmentStart) &&
             (scheduleInterval.contains(appointmentEnd) ||
-              scheduleInterval.end == appointmentEnd)
+              scheduleInterval.end.toUTC().toString() ==
+                appointmentEnd.toUTC().toString())
           ) {
             return true;
           }
