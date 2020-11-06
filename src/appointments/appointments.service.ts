@@ -44,7 +44,6 @@ export class AppointmentsService {
       });
     }
 
-    // we add +1 because sunday is 0 and we store sunday as 1
     const appointmentDayOfWeek: WEEK_DAY = appointmentStartTime.get('weekday');
     const schedules: Array<PractitionerSchedule> = [];
     schedules.push(
@@ -82,7 +81,8 @@ export class AppointmentsService {
           const scheduleInterval = Interval.fromDateTimes(sStart, sEnd);
           if (
             scheduleInterval.contains(appointmentStart) &&
-            scheduleInterval.contains(appointmentEnd)
+            (scheduleInterval.contains(appointmentEnd) ||
+              scheduleInterval.end == appointmentEnd)
           ) {
             return true;
           }
