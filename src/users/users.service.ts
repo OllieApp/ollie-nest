@@ -10,7 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { COUNTRY_CODE } from '../shared/country-code.dto';
+import { COUNTRY_CODE } from '../shared/dto/country-code.dto';
 import * as crypto from 'crypto';
 import {
   FIREBASE_ADMIN_INJECT,

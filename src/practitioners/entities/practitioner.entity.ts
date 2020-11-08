@@ -20,7 +20,7 @@ import {
 import { PractitionerCategory } from './practitioner-category.entity';
 import { GENDER } from '../dto/gender.dto';
 import Appointment from 'src/appointments/entities/appointment.entity';
-import { COUNTRY_CODE } from 'src/shared/country-code.dto';
+import { COUNTRY_CODE } from 'src/shared/dto/country-code.dto';
 import Review from 'src/reviews/entities/review.entity';
 
 @Entity('practitioner')
