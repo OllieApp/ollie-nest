@@ -64,7 +64,7 @@ export class AppointmentsController {
 
     // TODO: if we ever add logic for appointments that are not automatically confirmed,
     // do not send the user email only when the appointment is confirmed
-    await this.emailService.sendUserAppointmentConfirmed(practitioner.email, {
+    await this.emailService.sendUserAppointmentConfirmed(user.email, {
       appointmentStartTime: appointment.startTime,
       isVirtual: appointment.isVirtual,
       practitionerTitle: practitioner.title,
@@ -93,7 +93,7 @@ export class AppointmentsController {
       await this.emailService.sendUserVideoAppointmentDetails(user.email, {
         appointmentStartTime: appointment.startTime,
         practitionerTitle: practitioner.title,
-        practitionerVideoUrl: appointment.doctorVideoUrl,
+        practitionerVideoUrl: appointment.userVideoUrl,
         userFirstName: user.firstName,
       });
     }
