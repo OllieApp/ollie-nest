@@ -1,4 +1,4 @@
-export interface PractitionerVideoAppointmentDetailsPayload {
+export interface UserVideoAppointmentDetailsPayload {
   practitioner: PractitionerPayload;
   user: UserPayload;
   roomUrl: string;
@@ -11,5 +11,4 @@ interface PractitionerPayload {
 
 interface UserPayload {
   firstName: string;
-  lastName: string;
 }

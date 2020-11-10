@@ -10,6 +10,8 @@ export const practitionerAppointmentCancelledByUserTemplateId =
   'd-2926d8b29c53429aa2dde56293c3e566';
 export const practitionerVideoAppointmentDetailsTemplateId =
   'd-7fb568ddf8f54c4493e6f8470cd4ca5c';
+export const userVideoAppointmentDetailsTemplateId =
+  'd-917bea7de13d4859b46e5be6e9f78c35';
 export const timeFormat = 't';
 export const weekdayFormat = 'cccc';
 export const dateFormat = 'DDD';

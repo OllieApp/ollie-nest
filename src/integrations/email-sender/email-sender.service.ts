@@ -17,6 +17,7 @@ import {
   userAppointmentCancelledByPractitionerTemplateId,
   practitionerAppointmentCancelledByUserTemplateId,
   practitionerVideoAppointmentDetailsTemplateId,
+  userVideoAppointmentDetailsTemplateId,
 } from './constants';
 import { Injectable } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
@@ -24,6 +25,8 @@ import { mapPractitionerCategoryToString } from 'src/shared/utils/utilts';
 import { PractitionerAppointmentReceivedPayload } from './payloads/practitioner-appointment-received.payload';
 import { PractitionerAppointmentReceivedRequest } from './requests/practitioner-appointment-received.request';
 import { PractitionerVideoAppointmentDetailsRequest } from './requests/practitioner-video-appointment-details.request';
+import { UserVideoAppointmentDetailsRequest } from './requests/user-video-appointment-details.request';
+import { UserVideoAppointmentDetailsPayload } from './payloads/user-video-appointment-details.payload';
 
 //TODO: Format the date to User's region when we have that information
 @Injectable()
@@ -189,6 +192,35 @@ export class EmailSenderService {
       to: practitionerEmail,
       from: ollieSendFromEmail,
       templateId: practitionerVideoAppointmentDetailsTemplateId,
+      dynamicTemplateData: templateData,
+    });
+  }
+
+  async sendUserVideoAppointmentDetails(
+    userEmail: string,
+    request: UserVideoAppointmentDetailsRequest,
+  ) {
+    const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
+      'SAST',
+    );
+
+    const templateData: UserVideoAppointmentDetailsPayload = {
+      practitioner: {
+        title: request.practitionerTitle,
+      },
+      user: {
+        firstName: request.userFirstName,
+      },
+      roomUrl: request.practitionerVideoUrl,
+      startTime: `${luxonDate.toFormat(timeFormat)} on ${luxonDate.toFormat(
+        weekdayFormat,
+      )}, ${luxonDate.toFormat(dateFormat)}`,
+    };
+
+    await this.sendgrid.send({
+      to: userEmail,
+      from: ollieSendFromEmail,
+      templateId: userVideoAppointmentDetailsTemplateId,
       dynamicTemplateData: templateData,
     });
   }
