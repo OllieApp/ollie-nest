@@ -48,7 +48,7 @@ export class EmailSenderService {
     request: UserAppointmentConfirmedRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: UserAppointmentConfirmedPayload = {
@@ -83,7 +83,7 @@ export class EmailSenderService {
     request: PractitionerAppointmentReceivedRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: PractitionerAppointmentReceivedPayload = {
@@ -114,7 +114,7 @@ export class EmailSenderService {
     request: UserAppointmentCancelledByPractitionerRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: UserAppointmentCancelledByPractitionerPayload = {
@@ -142,7 +142,7 @@ export class EmailSenderService {
     request: PractitionerAppointmentCancelledByUserRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: PractitionerAppointmentCancelledByUserPayload = {
@@ -171,7 +171,7 @@ export class EmailSenderService {
     request: PractitionerVideoAppointmentDetailsRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: PractitionerVideoAppointmentDetailsPayload = {
@@ -201,7 +201,7 @@ export class EmailSenderService {
     request: UserVideoAppointmentDetailsRequest,
   ) {
     const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
-      'SAST',
+      'Africa/Johannesburg',
     );
 
     const templateData: UserVideoAppointmentDetailsPayload = {
