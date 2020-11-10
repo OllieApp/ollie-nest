@@ -1,8 +1,11 @@
+import { UserAppointmentCancelledConfirmationPayload } from './payloads/user-appointment-cancelled-confirmation.payload';
+import { PractitionerAppointmentCancelledConfirmationPayload } from './payloads/practitioner-appointment-cancelled-confirmation.payload';
+import { PractitionerAppointmentCancelledConfirmationRequest } from './requests/practitioner-appointment-cancelled-confirmation.request';
 import { PractitionerVideoAppointmentDetailsPayload } from './payloads/practitioner-video-appointment-details.payload';
-import { PractitionerAppointmentCancelledByUserPayload } from './payloads/practitioner-appointment-cancelled.payload';
-import { PractitionerAppointmentCancelledByUserRequest } from './requests/practitioner-appointment-cancelled.request';
-import { UserAppointmentCancelledByPractitionerPayload } from './payloads/user-appointment-cancelled.payload';
-import { UserAppointmentCancelledByPractitionerRequest } from './requests/user-appointment-cancelled.request';
+import { PractitionerAppointmentCancelledByUserPayload } from './payloads/practitioner-appointment-cancelled-by-user.payload';
+import { PractitionerAppointmentCancelledByUserRequest } from './requests/practitioner-appointment-cancelled-by-user.request';
+import { UserAppointmentCancelledByPractitionerPayload } from './payloads/user-appointment-cancelled-by-practitioner.payload';
+import { UserAppointmentCancelledByPractitionerRequest } from './requests/user-appointment-cancelled-by-practitioner.request';
 import { DateTime } from 'luxon';
 import { UserAppointmentConfirmedPayload } from './payloads/user-appointment-confirmed.payload';
 import { UserAppointmentConfirmedRequest } from './requests/user-appointment-confirmed.request';
@@ -18,6 +21,8 @@ import {
   practitionerAppointmentCancelledByUserTemplateId,
   practitionerVideoAppointmentDetailsTemplateId,
   userVideoAppointmentDetailsTemplateId,
+  practitionerAppointmentCancelledConfirmationTemplateId,
+  userAppointmentCancelledConfirmationTemplateId,
 } from './constants';
 import { Injectable } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
@@ -27,6 +32,7 @@ import { PractitionerAppointmentReceivedRequest } from './requests/practitioner-
 import { PractitionerVideoAppointmentDetailsRequest } from './requests/practitioner-video-appointment-details.request';
 import { UserVideoAppointmentDetailsRequest } from './requests/user-video-appointment-details.request';
 import { UserVideoAppointmentDetailsPayload } from './payloads/user-video-appointment-details.payload';
+import { UserAppointmentCancelledConfirmationRequest } from './requests/user-appointment-cancelled-confirmation.request';
 
 //TODO: Format the date to User's region when we have that information
 @Injectable()
@@ -166,7 +172,7 @@ export class EmailSenderService {
     });
   }
 
-  async sendPracitionerVideoAppointmentDetails(
+  async sendPractitionerVideoAppointmentDetails(
     practitionerEmail: string,
     request: PractitionerVideoAppointmentDetailsRequest,
   ) {
@@ -221,6 +227,53 @@ export class EmailSenderService {
       to: userEmail,
       from: ollieSendFromEmail,
       templateId: userVideoAppointmentDetailsTemplateId,
+      dynamicTemplateData: templateData,
+    });
+  }
+
+  async sendPractitionerAppointmentCancelledConfirmation(
+    practitionerEmail: string,
+    request: PractitionerAppointmentCancelledConfirmationRequest,
+  ) {
+    const templateData: PractitionerAppointmentCancelledConfirmationPayload = {
+      practitioner: {
+        title: request.practitionerTitle,
+      },
+      user: {
+        firstName: request.userFirstName,
+        email: request.userEmail,
+        lastName: request.userLastName,
+        phone: request.userPhone,
+      },
+    };
+
+    await this.sendgrid.send({
+      to: practitionerEmail,
+      from: ollieSendFromEmail,
+      templateId: practitionerAppointmentCancelledConfirmationTemplateId,
+      dynamicTemplateData: templateData,
+    });
+  }
+
+  async sendUserAppointmentCancelledConfirmation(
+    userEmail: string,
+    request: UserAppointmentCancelledConfirmationRequest,
+  ) {
+    const templateData: UserAppointmentCancelledConfirmationPayload = {
+      practitioner: {
+        title: request.practitionerTitle,
+        email: request.practitionerEmail,
+        phone: request.practitionerPhone,
+      },
+      user: {
+        firstName: request.userFirstName,
+      },
+    };
+
+    await this.sendgrid.send({
+      to: userEmail,
+      from: ollieSendFromEmail,
+      templateId: userAppointmentCancelledConfirmationTemplateId,
       dynamicTemplateData: templateData,
     });
   }

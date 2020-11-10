@@ -6,8 +6,12 @@ export const practitionerAppointmentReceivedTemplateId =
   'd-b4ce9fd4c85748a9a66ecac8dfffd0ec';
 export const userAppointmentCancelledByPractitionerTemplateId =
   'd-b27057cb96084b65b82b9b0dd79145fc';
+export const userAppointmentCancelledConfirmationTemplateId =
+  'd-6f955511a5534011838892c1915c755e';
 export const practitionerAppointmentCancelledByUserTemplateId =
   'd-2926d8b29c53429aa2dde56293c3e566';
+export const practitionerAppointmentCancelledConfirmationTemplateId =
+  'd-96386d95406b45d58d3beacd78bb8728';
 export const practitionerVideoAppointmentDetailsTemplateId =
   'd-7fb568ddf8f54c4493e6f8470cd4ca5c';
 export const userVideoAppointmentDetailsTemplateId =

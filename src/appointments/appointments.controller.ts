@@ -17,6 +17,7 @@ import { UsersService } from '../users/users.service';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-admin';
 import { CancelAppointmentRequest } from './requests/cancel-appointment.request';
 import { PRACTITIONER_CATEGORY } from 'src/practitioners/dto/category.dto';
+import { use } from 'passport';
 
 @Controller('/appointments')
 export class AppointmentsController {
@@ -80,7 +81,7 @@ export class AppointmentsController {
       appointment.userVideoUrl &&
       appointment.doctorVideoUrl
     ) {
-      await this.emailService.sendPracitionerVideoAppointmentDetails(
+      await this.emailService.sendPractitionerVideoAppointmentDetails(
         practitioner.email,
         {
           appointmentStartTime: appointment.startTime,
@@ -134,10 +135,10 @@ export class AppointmentsController {
     const practitionerIds = await this.practitionersService.getPractitionersIdsForUserId(
       userId,
     );
-    const isDoctorCancelling = practitionerIds.some(
+    const isPractitionerCancelling = practitionerIds.some(
       id => id === appointment.practitionerId,
     );
-    if (!isDoctorCancelling && appointment.userId != userId) {
+    if (!isPractitionerCancelling && appointment.userId != userId) {
       // if the user is not the practitioner nor the patient, we send a not found
       // as the user doesn't have access to the appointment
       throw new NotFoundException({
@@ -147,7 +148,7 @@ export class AppointmentsController {
     await this.appointmentsService.cancelAppointment(
       appointmentId,
       userId,
-      isDoctorCancelling,
+      isPractitionerCancelling,
       cancelAppointmentRequest.cancellationReason,
     );
 
@@ -155,21 +156,44 @@ export class AppointmentsController {
       appointment.practitionerId,
     );
     const user = await this.usersService.getUserById(appointment.userId);
-    if (isDoctorCancelling) {
-      this.emailService.sendUserAppointmentCancelledByPractitioner(user.email, {
-        appointmentStartTime: appointment.startTime,
-        practitionerTitle: practitioner.title,
-        userFirstName: user.firstName,
-      });
+    if (isPractitionerCancelling) {
+      await this.emailService.sendUserAppointmentCancelledByPractitioner(
+        user.email,
+        {
+          appointmentStartTime: appointment.startTime,
+          practitionerTitle: practitioner.title,
+          userFirstName: user.firstName,
+        },
+      );
+      // TODO: send the email to all users who have access to this practitioner when we allow multiple users per practitioner
+      await this.emailService.sendPractitionerAppointmentCancelledConfirmation(
+        practitioner.email,
+        {
+          practitionerTitle: practitioner.title,
+          userEmail: user.email,
+          userFirstName: user.firstName,
+          userLastName: user.lastName,
+          userPhone: user.phone,
+        },
+      );
     } else {
       // TODO: send the email to all users who have access to this practitioner when we allow multiple users per practitioner
-      this.emailService.sendPractitionerAppointmentCancelledByUser(
+      await this.emailService.sendPractitionerAppointmentCancelledByUser(
         practitioner.email,
         {
           appointmentStartTime: appointment.startTime,
           practitionerTitle: practitioner.title,
           userFirstName: user.firstName,
           userLastName: user.lastName,
+        },
+      );
+      await this.emailService.sendUserAppointmentCancelledConfirmation(
+        user.email,
+        {
+          practitionerTitle: practitioner.title,
+          practitionerEmail: practitioner.email,
+          userFirstName: user.firstName,
+          practitionerPhone: practitioner.phone,
         },
       );
     }
