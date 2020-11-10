@@ -218,6 +218,17 @@ export class UsersService {
     return user;
   }
 
+  async getUserById(id: string): Promise<User | null> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .getOne();
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
+
   // this will have to move to a file service at a later point
   async updateAvatar(
     dataBuffer: Buffer,

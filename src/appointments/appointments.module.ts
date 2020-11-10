@@ -7,6 +7,7 @@ import Appointment from './entities/appointment.entity';
 import { UsersModule } from './../users/users.module';
 import { WherebyMeetingsModule } from 'src/integrations/whereby-meetings/whereby-meetings.module';
 import { AppointmentsController } from './appointments.controller';
+import { EmailSenderModule } from 'src/integrations/email-sender/email-sender.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AppointmentsController } from './appointments.controller';
     UsersModule,
     PractitionersModule,
     WherebyMeetingsModule,
+    EmailSenderModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],
