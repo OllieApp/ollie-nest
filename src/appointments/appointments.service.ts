@@ -158,11 +158,11 @@ export class AppointmentsService {
         .andWhere('ap.practitioner_id = :practitionerId', {
           practitionerId: practitionerId,
         })
-        .andWhere('ap.status_id <> :statusId', {
-          statusId: APPOINTMENT_STATUS.Cancelled as number,
+        .andWhere('ap.status_id != :statusCancelledId', {
+          statusCancelledId: APPOINTMENT_STATUS.Cancelled,
         })
-        .andWhere('ap.status_id <> :statusId', {
-          statusId: APPOINTMENT_STATUS.Pending as number,
+        .andWhere('ap.status_id != :statusPendingId', {
+          statusPendingId: APPOINTMENT_STATUS.Pending,
         })
         .andWhere('ap.start_time >= :appointmentStart::timestamptz', {
           currentDate: appointmentStartTime.plus({ days: -1 }).toISO(),
