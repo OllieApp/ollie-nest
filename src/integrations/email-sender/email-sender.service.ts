@@ -1,3 +1,5 @@
+import { InternalAppointmentCreatedPayload } from './payloads/internal-appointment-created.payload';
+import { InternalAppointmentCreatedRequest } from './requests/internal-appointment-created.request';
 import { UserAppointmentCancelledConfirmationPayload } from './payloads/user-appointment-cancelled-confirmation.payload';
 import { PractitionerAppointmentCancelledConfirmationPayload } from './payloads/practitioner-appointment-cancelled-confirmation.payload';
 import { PractitionerAppointmentCancelledConfirmationRequest } from './requests/practitioner-appointment-cancelled-confirmation.request';
@@ -10,19 +12,11 @@ import { DateTime } from 'luxon';
 import { UserAppointmentConfirmedPayload } from './payloads/user-appointment-confirmed.payload';
 import { UserAppointmentConfirmedRequest } from './requests/user-appointment-confirmed.request';
 import {
-  welcomeEmailTemplateId,
-  userAppointmentConfirmedTemplateId,
   timeFormat,
   weekdayFormat,
   dateFormat,
   ollieSendFromEmail,
-  practitionerAppointmentReceivedTemplateId,
-  userAppointmentCancelledByPractitionerTemplateId,
-  practitionerAppointmentCancelledByUserTemplateId,
-  practitionerVideoAppointmentDetailsTemplateId,
-  userVideoAppointmentDetailsTemplateId,
-  practitionerAppointmentCancelledConfirmationTemplateId,
-  userAppointmentCancelledConfirmationTemplateId,
+  TemplateIds,
 } from './constants';
 import { Injectable } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
@@ -45,7 +39,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: userEmail,
       from: ollieSendFromEmail,
-      templateId: welcomeEmailTemplateId,
+      templateId: TemplateIds.welcomeEmail,
     });
   }
 
@@ -80,7 +74,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: userEmail,
       from: ollieSendFromEmail,
-      templateId: userAppointmentConfirmedTemplateId,
+      templateId: TemplateIds.userAppointmentConfirmed,
       dynamicTemplateData: templateData,
     });
   }
@@ -111,7 +105,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: practitionerEmail,
       from: ollieSendFromEmail,
-      templateId: practitionerAppointmentReceivedTemplateId,
+      templateId: TemplateIds.practitionerAppointmentReceived,
       dynamicTemplateData: templateData,
     });
   }
@@ -138,7 +132,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: userEmail,
       from: ollieSendFromEmail,
-      templateId: userAppointmentCancelledByPractitionerTemplateId,
+      templateId: TemplateIds.userAppointmentCancelledByPractitioner,
       dynamicTemplateData: templateData,
     });
   }
@@ -167,7 +161,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: practitionerEmail,
       from: ollieSendFromEmail,
-      templateId: practitionerAppointmentCancelledByUserTemplateId,
+      templateId: TemplateIds.practitionerAppointmentCancelledByUser,
       dynamicTemplateData: templateData,
     });
   }
@@ -197,7 +191,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: practitionerEmail,
       from: ollieSendFromEmail,
-      templateId: practitionerVideoAppointmentDetailsTemplateId,
+      templateId: TemplateIds.practitionerVideoAppointmentDetails,
       dynamicTemplateData: templateData,
     });
   }
@@ -226,7 +220,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: userEmail,
       from: ollieSendFromEmail,
-      templateId: userVideoAppointmentDetailsTemplateId,
+      templateId: TemplateIds.userVideoAppointmentDetails,
       dynamicTemplateData: templateData,
     });
   }
@@ -250,7 +244,7 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: practitionerEmail,
       from: ollieSendFromEmail,
-      templateId: practitionerAppointmentCancelledConfirmationTemplateId,
+      templateId: TemplateIds.practitionerAppointmentCancelledConfirmation,
       dynamicTemplateData: templateData,
     });
   }
@@ -273,7 +267,40 @@ export class EmailSenderService {
     await this.sendgrid.send({
       to: userEmail,
       from: ollieSendFromEmail,
-      templateId: userAppointmentCancelledConfirmationTemplateId,
+      templateId: TemplateIds.userAppointmentCancelledConfirmation,
+      dynamicTemplateData: templateData,
+    });
+  }
+
+  async sendInternalAppointmentCreated(
+    request: InternalAppointmentCreatedRequest,
+  ) {
+    const luxonDate = DateTime.fromJSDate(request.appointmentStartTime).setZone(
+      'Africa/Johannesburg',
+    );
+
+    const templateData: InternalAppointmentCreatedPayload = {
+      practitioner: {
+        title: request.practitionerTitle,
+        email: request.practitionerEmail,
+        phone: request.practitionerPhone,
+      },
+      user: {
+        firstName: request.userFirstName,
+        lastName: request.userLastName,
+        phone: request.userPhone,
+        email: request.userEmail,
+      },
+      isVirtual: request.appointmentIsVirtual,
+      startTime: `${luxonDate.toFormat(timeFormat)} on ${luxonDate.toFormat(
+        weekdayFormat,
+      )}, ${luxonDate.toFormat(dateFormat)}`,
+    };
+
+    await this.sendgrid.send({
+      to: ['marc@ollie.health', 'cameron@ollie.health'],
+      from: ollieSendFromEmail,
+      templateId: TemplateIds.internalAppointmentCreated,
       dynamicTemplateData: templateData,
     });
   }
