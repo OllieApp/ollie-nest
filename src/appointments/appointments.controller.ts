@@ -197,5 +197,16 @@ export class AppointmentsController {
         },
       );
     }
+    await this.emailService.sendInternalAppointmentCreated({
+      appointmentStartTime: appointment.startTime,
+      appointmentIsVirtual: appointment.isVirtual,
+      userEmail: user.email,
+      userFirstName: user.firstName,
+      userLastName: user.lastName,
+      userPhone: user.phone,
+      practitionerTitle: practitioner.title,
+      practitionerEmail: practitioner.email,
+      practitionerPhone: practitioner.phone,
+    });
   }
 }
