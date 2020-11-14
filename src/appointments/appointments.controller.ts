@@ -133,7 +133,7 @@ export class AppointmentsController {
     @Param('id') appointmentId: string,
   ) {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
     const appointment = await this.appointmentsService.getAppointmentById(
       appointmentId,
@@ -144,12 +144,12 @@ export class AppointmentsController {
       });
     }
     const practitionerIds = await this.practitionersService.getPractitionersIdsForUserId(
-      userId,
+      user.id,
     );
     const isPractitionerCancelling = practitionerIds.some(
       id => id === appointment.practitionerId,
     );
-    if (!isPractitionerCancelling && appointment.userId != userId) {
+    if (!isPractitionerCancelling && appointment.userId != user.id) {
       // if the user is not the practitioner nor the patient, we send a not found
       // as the user doesn't have access to the appointment
       throw new NotFoundException({
@@ -158,7 +158,7 @@ export class AppointmentsController {
     }
     await this.appointmentsService.cancelAppointment(
       appointmentId,
-      userId,
+      user.id,
       isPractitionerCancelling,
       cancelAppointmentRequest.cancellationReason,
     );
@@ -166,7 +166,6 @@ export class AppointmentsController {
     const practitioner = await this.practitionersService.getPractitionerById(
       appointment.practitionerId,
     );
-    const user = await this.usersService.getUserById(appointment.userId);
     if (isPractitionerCancelling) {
       await this.emailService.sendUserAppointmentCancelledByPractitioner(
         user.email,

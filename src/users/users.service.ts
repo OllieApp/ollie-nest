@@ -208,10 +208,17 @@ export class UsersService {
   }
 
   async getUserForUid(uid: string): Promise<User> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.uid = :uid', { uid })
-      .getOne();
+    let user: User | null = null;
+    try {
+      user = await this.userRepository
+        .createQueryBuilder('user')
+        .where('user.uid = :uid', { uid })
+        .getOne();
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: 'Something went wrong when trying to fetch the user.',
+      });
+    }
     if (!user) {
       throw new NotFoundException({ message: 'The user was not found.' });
     }
