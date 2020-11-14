@@ -88,7 +88,6 @@ export class PractitionerSchedulesService {
       throw new InternalServerErrorException({
         message:
           'Something went wrong while trying to insert the schedule values',
-        error: error,
       });
     }
   }
