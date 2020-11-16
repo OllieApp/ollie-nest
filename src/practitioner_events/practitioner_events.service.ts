@@ -211,7 +211,7 @@ export class PractitionerEventsService {
     event.isConfirmed = isConfirmed ?? event.isConfirmed;
     event.isAllDay = isAllDay ?? event.isAllDay;
 
-    if (isAllDay) {
+    if (event.isAllDay) {
       if (eventEndTime.startOf('day') <= eventStartTime.startOf('day')) {
         eventEndTime = eventStartTime.plus({ days: 1 });
       }
