@@ -101,9 +101,8 @@ export class PractitionerEventsService {
   }
 
   async deletePractitionerEvent(eventId: string) {
-    const event = await this.getPractitionerEvent(eventId);
     try {
-      await this.practitionerEventsRepository.delete(event);
+      await this.practitionerEventsRepository.delete(eventId);
     } catch (error) {
       throw new InternalServerErrorException({
         message: 'Something went wrong while trying to delete the event.',
