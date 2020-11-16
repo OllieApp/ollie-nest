@@ -63,6 +63,10 @@ export class PractitionerEventsService {
     event.createdById = userId;
 
     if (isAllDay) {
+      if (eventEndTime.startOf('day') == eventStartTime.startOf('day')) {
+        eventEndTime = eventStartTime.plus({ days: 1 });
+      }
+
       eventEndTime = eventEndTime
         .set({ hour: eventStartTime.hour, minute: eventStartTime.minute })
         .minus({ seconds: 1 } as Duration);
