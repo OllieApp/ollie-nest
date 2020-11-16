@@ -40,15 +40,14 @@ export class PractitionerEventsController {
   ): Promise<PractitionerEventDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    const practitioner = await this.practitionersService.getPractitionerById(
-      createEventRequest.practitionerId,
-    );
 
     const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
       user.id,
     );
 
-    if (!userPractitionersIds.some(id => id == practitioner.id)) {
+    if (
+      !userPractitionersIds.some(id => id == createEventRequest.practitionerId)
+    ) {
       throw new NotFoundException({
         message: 'The practitioner could not be found.',
       });
