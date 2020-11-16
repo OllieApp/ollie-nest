@@ -48,29 +48,22 @@ export class PractitionersController {
     try {
       userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
     } catch (error) {
-      if (!(error instanceof NotFoundException)) {
-        throw new InternalServerErrorException({
-          message: 'Something went wrong when trying to fetch the user.',
-        });
+      if (error instanceof NotFoundException) {
+        userId = (
+          await this.usersService.create(
+            createPractitionerDto.firstName,
+            createPractitionerDto.lastName,
+            firebaseUser.email,
+            COUNTRY_CODE.SouthAfrica,
+            firebaseUser.uid,
+            firebaseUser.picture,
+          )
+        ).id;
       }
     }
 
-    // if the user doesn't exist, create one
-    if (!userId) {
-      userId = (
-        await this.usersService.create(
-          createPractitionerDto.firstName,
-          createPractitionerDto.lastName,
-          firebaseUser.email,
-          COUNTRY_CODE.SouthAfrica,
-          firebaseUser.uid,
-          firebaseUser.picture,
-        )
-      ).id;
-    }
-
-    //TODO: This will have to be deleted later, when we allow multiple practitioners
-    // per user
+    //TODO: This will have to be modfied later, when we allow multiple practitioners
+    // per user, as we currently use createdById from practitionerId
 
     const practitionerIds = await this.practitionersService.getPractitionersIdsForUserId(
       userId,
@@ -178,7 +171,7 @@ export class PractitionersController {
     );
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   @UseGuards(AuthGuard('firebase'))
   async update(
     @Request() req,
@@ -193,7 +186,7 @@ export class PractitionersController {
     );
     if (!userPractitionersIds.some(id => id == practitionerId)) {
       throw new NotFoundException({
-        message: 'The practitioner to be updated could not be found.',
+        message: 'The practitioner could not be found.',
       });
     }
 
