@@ -13,6 +13,7 @@ import {
   FIREBASE_ADMIN_INJECT,
 } from '@tfarras/nestjs-firebase-admin';
 import * as admin from 'firebase-admin';
+import { PractitionerEventsModule } from './practitioner_events/practitioner_events.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import * as admin from 'firebase-admin';
     PractitionersModule,
     AppointmentsModule,
     ReviewsModule,
+    PractitionerEventsModule,
   ],
   controllers: [AppController],
   providers: [],
