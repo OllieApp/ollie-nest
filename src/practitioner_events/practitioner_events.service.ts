@@ -234,6 +234,7 @@ export class PractitionerEventsService {
         event.practitionerId,
         eventStartTime,
         eventEndTime,
+        event.id,
       ))
     ) {
       throw new UnprocessableEntityException({
