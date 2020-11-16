@@ -14,6 +14,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
+import PractitionerEvent from 'src/practitioner_events/entities/practitioner_event.entity';
 
 @Entity('user')
 class User {
@@ -151,6 +152,20 @@ class User {
     { nullable: false, eager: false },
   )
   public createdPractitioners: Promise<Practitioner[]>;
+
+  @OneToMany(
+    type => PractitionerEvent,
+    calendarEvent => calendarEvent.createdBy,
+    { eager: false },
+  )
+  public createdPractitionerEvents: Promise<PractitionerEvent[]>;
+
+  @OneToMany(
+    type => PractitionerEvent,
+    calendarEvent => calendarEvent.updatedBy,
+    { eager: false },
+  )
+  public updatedPractitionerEvents: Promise<PractitionerEvent[]>;
 }
 
 export default User;

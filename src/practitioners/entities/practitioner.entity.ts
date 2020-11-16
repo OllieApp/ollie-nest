@@ -14,7 +14,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PractitionerCategory } from './practitioner-category.entity';
@@ -22,6 +21,7 @@ import { GENDER } from '../dto/gender.dto';
 import Appointment from 'src/appointments/entities/appointment.entity';
 import { COUNTRY_CODE } from 'src/shared/dto/country-code.dto';
 import Review from 'src/reviews/entities/review.entity';
+import PractitionerEvent from 'src/practitioner_events/entities/practitioner_event.entity';
 
 @Entity('practitioner')
 @Check(`"consultation_pricing_from" < "consultation_pricing_to"`)
@@ -218,5 +218,12 @@ class Practitioner {
     { eager: false },
   )
   public reviews: Promise<Review[]>;
+
+  @OneToMany(
+    type => PractitionerEvent,
+    calendarEvent => calendarEvent.practitioner,
+    { eager: false },
+  )
+  public events: Promise<PractitionerEvent[]>;
 }
 export default Practitioner;
