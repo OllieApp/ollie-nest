@@ -247,15 +247,17 @@ export class PractitionerEventsService {
 
   async getPractitionerIdForEventId(eventId: string): Promise<string | null> {
     try {
-      const event = await this.practitionerEventsRepository
+      const entity: {
+        practitioner_id: string;
+      } = await this.practitionerEventsRepository
         .createQueryBuilder('event')
         .select(['event.practitioner_id'])
         .where('event.id = :eventId', {
           eventId: eventId,
         })
-        .getOne();
-      if (event) {
-        return event.practitionerId;
+        .getRawOne();
+      if (entity) {
+        return entity.practitioner_id;
       }
     } catch (error) {}
     return null;
