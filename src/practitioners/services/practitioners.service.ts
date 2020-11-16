@@ -24,7 +24,6 @@ import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity
 
 @Injectable()
 export class PractitionersService {
-  userRepository: any;
   constructor(
     @InjectRepository(Practitioner)
     private readonly practitionerRepository: Repository<Practitioner>,
@@ -34,15 +33,9 @@ export class PractitionersService {
   async createPractitioner(
     userId: string,
     userUid: string,
-    createPractitionerDto: CreatePractitionerRequest,
+    request: CreatePractitionerRequest,
   ): Promise<Practitioner> {
-    const {
-      firstName,
-      lastName,
-      category,
-      email,
-      gender,
-    } = createPractitionerDto;
+    const { firstName, lastName, category, email, gender } = request;
     const title = `Dr. ${firstName} ${lastName}`;
 
     if (!firstName || firstName.trim().length == 0) {
@@ -145,39 +138,45 @@ export class PractitionersService {
 
   async updatePractitioner(
     practitionerId: string,
-    data: UpdatePractitionerRequest,
+    request: UpdatePractitionerRequest,
   ) {
-    if (data.title && data.title.trim().length == 0) {
+    if (request.title && request.title.trim().length == 0) {
       throw new BadRequestException({
         message: 'The title of the practitioner cannot be empty.',
       });
     }
-    if (data.email && !emailValidationPattern.test(data.email)) {
+    if (request.email && !emailValidationPattern.test(request.email)) {
       throw new BadRequestException({
         message: 'The email of the practitioner is invalid.',
       });
     }
-    if (data.consultationPricingFrom && data.consultationPricingFrom < 0) {
+    if (
+      request.consultationPricingFrom &&
+      request.consultationPricingFrom < 0
+    ) {
       throw new BadRequestException({
         message:
           'The starting price of a consultation has to be a positive decimal number.',
       });
     }
-    if (data.consultationPricingTo && data.consultationPricingTo < 0) {
+    if (request.consultationPricingTo && request.consultationPricingTo < 0) {
       throw new BadRequestException({
         message:
           'The highest price of a consultation has to be a positive decimal number.',
       });
     }
 
-    if (data.medicalAids && data.medicalAids.some(m => !(m in MEDICAL_AID))) {
+    if (
+      request.medicalAids &&
+      request.medicalAids.some(m => !(m in MEDICAL_AID))
+    ) {
       throw new BadRequestException({
         message:
           'One of the medical aids could not be find in the available medical aids.',
       });
     }
 
-    if (data.category && !(data.category in PRACTITIONER_CATEGORY)) {
+    if (request.category && !(request.category in PRACTITIONER_CATEGORY)) {
       throw new BadRequestException({
         message:
           'The category could not be found in the available practitioner categories.',
@@ -185,18 +184,18 @@ export class PractitionersService {
     }
 
     if (
-      data.location &&
-      (data.location.latitude > 90 ||
-        data.location.latitude < -90 ||
-        data.location.longitude > 180 ||
-        data.location.longitude < -180)
+      request.location &&
+      (request.location.latitude > 90 ||
+        request.location.latitude < -90 ||
+        request.location.longitude > 180 ||
+        request.location.longitude < -180)
     ) {
       throw new BadRequestException({
         message: "The location is not within Earth's location bounds.",
       });
     }
 
-    if (data.languages && data.languages.some(l => !(l in LANGUAGE))) {
+    if (request.languages && request.languages.some(l => !(l in LANGUAGE))) {
       throw new BadRequestException({
         message: 'One of the languages is not part of our available languages.',
       });
@@ -207,22 +206,27 @@ export class PractitionersService {
         Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
       };
       const updatedPractitioner: QueryDeepPartialEntity<Practitioner> = {
-        ...data,
-        medicalAids: data.medicalAids
-          ? data.medicalAids.map(m => ({ id: m }))
+        ...request,
+        medicalAids: request.medicalAids
+          ? request.medicalAids.map(m => ({ id: m }))
           : null,
-        category: data.category
+        category: request.category
           ? {
-              id: data.category,
+              id: request.category,
             }
           : null,
-        location: data.location
+        location: request.location
           ? {
               type: 'Point',
-              coordinates: [data.location.latitude, data.location.longitude],
+              coordinates: [
+                request.location.latitude,
+                request.location.longitude,
+              ],
             }
           : null,
-        languages: data.languages ? data.languages.map(l => ({ id: l })) : null,
+        languages: request.languages
+          ? request.languages.map(l => ({ id: l }))
+          : null,
       };
 
       removeEmpty(updatedPractitioner);
