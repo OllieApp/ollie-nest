@@ -63,7 +63,7 @@ export class PractitionerEventsService {
     event.createdById = userId;
 
     if (isAllDay) {
-      if (eventEndTime.startOf('day') == eventStartTime.startOf('day')) {
+      if (eventEndTime.startOf('day') <= eventStartTime.startOf('day')) {
         eventEndTime = eventStartTime.plus({ days: 1 });
       }
 
