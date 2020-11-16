@@ -124,11 +124,13 @@ export class PractitionerEventsService {
    * @param practitionerId
    * @param startTime
    * @param endTime
+   * @param eventId the event id that will be the disregarded when querying for intervals
    */
   async isIntervalOverlappingAnyEvent(
     practitionerId: string,
     startTime: DateTime,
     endTime: DateTime,
+    eventId?: string,
   ): Promise<boolean> {
     try {
       const overlappingConfirmedEvent = await this.practitionerEventsRepository
@@ -145,6 +147,9 @@ export class PractitionerEventsService {
         })
         .andWhere('ev.is_confirmed = TRUE')
         .andWhere('ev.end_time >= current_timestamp')
+        .andWhere(eventId ? 'ev.id != :eventId' : '1 = 1', {
+          eventId,
+        })
         .limit(1)
         .getOne();
       return overlappingConfirmedEvent ? true : false;
