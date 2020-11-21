@@ -1,3 +1,4 @@
+import { PractitionerEventsModule } from './../practitioner_events/practitioner_events.module';
 import { AppointmentsService } from './appointments.service';
 import { PractitionersModule } from './../practitioners/practitioners.module';
 import { Module } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { EmailSenderModule } from 'src/integrations/email-sender/email-sender.mo
     PractitionersModule,
     WherebyMeetingsModule,
     EmailSenderModule,
+    PractitionerEventsModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],

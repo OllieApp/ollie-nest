@@ -15,6 +15,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { APPOINTMENT_STATUS } from './dto/appointment-status.dto';
 import RRule, { Weekday } from 'rrule';
 import { DateTime, Interval } from 'luxon';
+import { PractitionerEventsService } from 'src/practitioner_events/practitioner_events.service';
 
 @Injectable()
 export class AppointmentsService {
@@ -23,6 +24,7 @@ export class AppointmentsService {
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly wherebyService: WherebyMeetingsService,
     private readonly practitionerSchedulesService: PractitionerSchedulesService,
+    private readonly practitionerEventsService: PractitionerEventsService,
   ) {}
 
   async createAppointment(
@@ -175,14 +177,27 @@ export class AppointmentsService {
     } catch (error) {
       // LOG failure to check appointments
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Failed to retrieve the existing appointments to check if there are no overlapping appointments.',
+        ],
       });
     }
 
     if (overlappingAppointment) {
       throw new UnprocessableEntityException({
         message: 'The appointment overlaps with other existing appointments.',
+      });
+    }
+
+    if (
+      this.practitionerEventsService.isIntervalOverlappingAnyEvent(
+        practitionerId,
+        appointmentStartTime.toUTC(),
+        appointmentEndTime.toUTC(),
+      )
+    ) {
+      throw new UnprocessableEntityException({
+        message: ['The appointment overlaps with other existing events.'],
       });
     }
 

@@ -5,7 +5,6 @@ import {
   BadRequestException,
   Controller,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Patch,
   Post,
