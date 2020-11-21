@@ -101,7 +101,7 @@ export class UsersController {
         'The image to be uploaded was missing from the request.',
       );
       throw new BadRequestException({
-        message: 'The image to be uploaded was missing from the request.',
+        message: ['The image to be uploaded was missing from the request.'],
       });
     }
     if (!PHOTO_ALLOWED_EXTENSIONS.test(file.mimetype)) {
@@ -109,7 +109,7 @@ export class UsersController {
         `Only the following types are supported: JPG, JPEG and PNG. The one used was ${file.mimetype}`,
       );
       throw new BadRequestException({
-        message: 'Only the following types are supported: JPG, JPEG and PNG.',
+        message: ['Only the following types are supported: JPG, JPEG and PNG.'],
       });
     }
 
@@ -131,7 +131,7 @@ export class UsersController {
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
     if (user.id != userId) {
       throw new ForbiddenException({
-        message: 'Cannot add favorites to this user.',
+        message: ['Cannot add favorites to this user.'],
       });
     }
     await this.usersService.addPractitionerToFavorites(user.id, practitionerId);
@@ -148,7 +148,7 @@ export class UsersController {
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
     if (user.id != userId) {
       throw new ForbiddenException({
-        message: 'Cannot add favorites to this user.',
+        message: ['Cannot add favorites to this user.'],
       });
     }
     await this.usersService.removePractitionerFromFavorites(

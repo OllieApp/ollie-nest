@@ -133,7 +133,7 @@ export class PractitionersController {
 
     if (!practitioner) {
       throw new NotFoundException({
-        message: 'The requested practitioner was not found.',
+        message: ['The requested practitioner was not found.'],
       });
     }
 
@@ -185,7 +185,7 @@ export class PractitionersController {
     );
     if (!userPractitionersIds.some(id => id == practitionerId)) {
       throw new NotFoundException({
-        message: 'The practitioner could not be found.',
+        message: ['The practitioner could not be found.'],
       });
     }
 
@@ -226,17 +226,17 @@ export class PractitionersController {
     );
     if (!userPractitionersIds.some(id => id == practitionerId)) {
       throw new NotFoundException({
-        message: 'The practitioner to be updated could not be found.',
+        message: ['The practitioner to be updated could not be found.'],
       });
     }
     if (!req.file) {
       throw new BadRequestException({
-        message: 'The image to be uploaded was missing from the request.',
+        message: ['The image to be uploaded was missing from the request.'],
       });
     }
     if (!PHOTO_ALLOWED_EXTENSIONS.test(file.mimetype)) {
       throw new BadRequestException({
-        message: 'Only the following types are supported: JPG, JPEG and PNG.',
+        message: ['Only the following types are supported: JPG, JPEG and PNG.'],
       });
     }
     return await this.practitionersService.updateAvatar(

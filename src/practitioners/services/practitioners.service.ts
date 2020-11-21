@@ -40,18 +40,18 @@ export class PractitionersService {
 
     if (!firstName || firstName.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The first name of the practitioner cannot be empty.',
+        message: ['The first name of the practitioner cannot be empty.'],
       });
     }
     if (!lastName || lastName.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The last name of the practitioner cannot be empty.',
+        message: ['The last name of the practitioner cannot be empty.'],
       });
     }
 
     if (!emailValidationPattern.test(email)) {
       throw new BadRequestException({
-        message: 'The email for the practitioner is invalid.',
+        message: ['The email for the practitioner is invalid.'],
       });
     }
 
@@ -83,7 +83,9 @@ export class PractitionersService {
       return await this.practitionerRepository.save(newPractitioner);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to create the practitioner',
+        message: [
+          'Something went wrong while trying to create the practitioner',
+        ],
       });
     }
   }
@@ -99,8 +101,9 @@ export class PractitionersService {
       );
     } catch (error) {
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Something went wrong while trying to fetch the ids for the practitioners.',
+        ],
       });
     }
   }
@@ -117,7 +120,9 @@ export class PractitionersService {
       );
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to fetch the practitioner.',
+        message: [
+          'Something went wrong while trying to fetch the practitioner.',
+        ],
       });
     }
   }
@@ -131,7 +136,9 @@ export class PractitionersService {
       );
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to fetch the practitioner.',
+        message: [
+          'Something went wrong while trying to fetch the practitioner.',
+        ],
       });
     }
   }
@@ -142,12 +149,12 @@ export class PractitionersService {
   ) {
     if (request.title && request.title.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The title of the practitioner cannot be empty.',
+        message: ['The title of the practitioner cannot be empty.'],
       });
     }
     if (request.email && !emailValidationPattern.test(request.email)) {
       throw new BadRequestException({
-        message: 'The email of the practitioner is invalid.',
+        message: ['The email of the practitioner is invalid.'],
       });
     }
     if (
@@ -155,14 +162,16 @@ export class PractitionersService {
       request.consultationPricingFrom < 0
     ) {
       throw new BadRequestException({
-        message:
+        message: [
           'The starting price of a consultation has to be a positive decimal number.',
+        ],
       });
     }
     if (request.consultationPricingTo && request.consultationPricingTo < 0) {
       throw new BadRequestException({
-        message:
+        message: [
           'The highest price of a consultation has to be a positive decimal number.',
+        ],
       });
     }
 
@@ -171,15 +180,17 @@ export class PractitionersService {
       request.medicalAids.some(m => !(m in MEDICAL_AID))
     ) {
       throw new BadRequestException({
-        message:
+        message: [
           'One of the medical aids could not be find in the available medical aids.',
+        ],
       });
     }
 
     if (request.category && !(request.category in PRACTITIONER_CATEGORY)) {
       throw new BadRequestException({
-        message:
+        message: [
           'The category could not be found in the available practitioner categories.',
+        ],
       });
     }
 
@@ -191,13 +202,15 @@ export class PractitionersService {
         request.location.longitude < -180)
     ) {
       throw new BadRequestException({
-        message: "The location is not within Earth's location bounds.",
+        message: ["The location is not within Earth's location bounds."],
       });
     }
 
     if (request.languages && request.languages.some(l => !(l in LANGUAGE))) {
       throw new BadRequestException({
-        message: 'One of the languages is not part of our available languages.',
+        message: [
+          'One of the languages is not part of our available languages.',
+        ],
       });
     }
 
@@ -234,8 +247,9 @@ export class PractitionersService {
       this.practitionerRepository.update(practitionerId, updatedPractitioner);
     } catch (error) {
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Something went wrong while trying to update the practitioner.',
+        ],
       });
     }
   }
@@ -250,7 +264,7 @@ export class PractitionersService {
     );
     if (!practitioner) {
       throw new NotFoundException({
-        message: 'The practitioner could not be found.',
+        message: ['The practitioner could not be found.'],
       });
     }
 

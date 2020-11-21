@@ -41,14 +41,16 @@ export class PractitionerEventsService {
 
     if (eventStartTime < DateTime.utc()) {
       throw new BadRequestException({
-        message:
+        message: [
           'The start time of the event can not be before the current date and time.',
+        ],
       });
     }
     if (eventEndTime <= eventStartTime) {
       throw new BadRequestException({
-        message:
+        message: [
           'The end time of the event can not be before or at the same time as the start time.',
+        ],
       });
     }
 
@@ -87,7 +89,7 @@ export class PractitionerEventsService {
       ))
     ) {
       throw new UnprocessableEntityException({
-        message: 'The event overlaps with other existing events.',
+        message: ['The event overlaps with other existing events.'],
       });
     }
 
@@ -95,7 +97,7 @@ export class PractitionerEventsService {
       return await this.practitionerEventsRepository.save(event);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to insert the event.',
+        message: ['Something went wrong while trying to insert the event.'],
       });
     }
   }
@@ -105,7 +107,7 @@ export class PractitionerEventsService {
       await this.practitionerEventsRepository.delete(eventId);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to delete the event.',
+        message: ['Something went wrong while trying to delete the event.'],
       });
     }
   }
@@ -113,7 +115,9 @@ export class PractitionerEventsService {
   async getPractitionerEvent(eventId: string): Promise<PractitionerEvent> {
     const event = await this.getPractitionerEventById(eventId);
     if (!event) {
-      throw new NotFoundException({ message: 'The event could not be found.' });
+      throw new NotFoundException({
+        message: ['The event could not be found.'],
+      });
     }
     return event;
   }
@@ -155,7 +159,7 @@ export class PractitionerEventsService {
     } catch (error) {
       // LOG failure to check events
       throw new InternalServerErrorException({
-        message: 'Failed to check for overlapping events.',
+        message: ['Failed to check for overlapping events.'],
       });
     }
   }
@@ -189,8 +193,9 @@ export class PractitionerEventsService {
 
     if (eventEndTime <= eventStartTime) {
       throw new BadRequestException({
-        message:
+        message: [
           'The end time of the event can not be before or at the same time as the start time.',
+        ],
       });
     }
 
@@ -237,7 +242,7 @@ export class PractitionerEventsService {
       ))
     ) {
       throw new UnprocessableEntityException({
-        message: 'The event overlaps with other existing events.',
+        message: ['The event overlaps with other existing events.'],
       });
     }
 
@@ -245,7 +250,7 @@ export class PractitionerEventsService {
       return await this.practitionerEventsRepository.save(event);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to update the event.',
+        message: ['Something went wrong while trying to update the event.'],
       });
     }
   }

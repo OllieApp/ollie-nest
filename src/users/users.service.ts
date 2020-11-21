@@ -53,8 +53,9 @@ export class UsersService {
         error,
       );
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Something went wrong while checking for any existing users with this identity.',
+        ],
       });
     }
 
@@ -63,18 +64,18 @@ export class UsersService {
     }
     if (!firstName || firstName.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The first name of the user cannot be empty.',
+        message: ['The first name of the user cannot be empty.'],
       });
     }
     if (!lastName || lastName.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The last name of the user cannot be empty.',
+        message: ['The last name of the user cannot be empty.'],
       });
     }
 
     if (!emailValidationPattern.test(email)) {
       throw new BadRequestException({
-        message: 'The email of the user is invalid.',
+        message: ['The email of the user is invalid.'],
       });
     }
 
@@ -83,8 +84,9 @@ export class UsersService {
       !Object.values(COUNTRY_CODE).find(e => e == countryCode)
     ) {
       throw new BadRequestException({
-        message:
+        message: [
           'The provided country code for the user is not in the supported country code list.',
+        ],
       });
     }
 
@@ -117,7 +119,9 @@ export class UsersService {
         error,
       );
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to execute the operation.',
+        message: [
+          'Something went wrong while trying to execute the operation.',
+        ],
       });
     }
 
@@ -136,22 +140,25 @@ export class UsersService {
     const user = await this.getUserForUid(uid);
 
     if (!user) {
-      throw new NotFoundException({ message: 'The user could not be found.' });
+      throw new NotFoundException({
+        message: ['The user could not be found.'],
+      });
     }
     if (updatedUser.firstName?.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The first name of the user cannot be empty.',
+        message: ['The first name of the user cannot be empty.'],
       });
     }
     if (updatedUser.lastName?.trim().length == 0) {
       throw new BadRequestException({
-        message: 'The last name of the user cannot be empty.',
+        message: ['The last name of the user cannot be empty.'],
       });
     }
     if (updatedUser.medicalAid && !(updatedUser.medicalAid in MEDICAL_AID)) {
       throw new BadRequestException({
-        message:
+        message: [
           'The provided medical aid is not in the supported medical aid range.',
+        ],
       });
     }
     if (
@@ -159,14 +166,16 @@ export class UsersService {
       !Object.values(COUNTRY_CODE).find(e => e == updatedUser.countryCode)
     ) {
       throw new BadRequestException({
-        message:
+        message: [
           'The provided country code is not in the supported country code list.',
+        ],
       });
     }
     if (!(updatedUser.medicalAid in MEDICAL_AID)) {
       throw new BadRequestException({
-        message:
+        message: [
           'The provided medical aid does not exist in our medical aids list.',
+        ],
       });
     }
     try {
@@ -202,7 +211,9 @@ export class UsersService {
         error,
       );
       throw new InternalServerErrorException({
-        message: 'Something went wrong while trying to execute the operation.',
+        message: [
+          'Something went wrong while trying to execute the operation.',
+        ],
       });
     }
   }
@@ -216,11 +227,11 @@ export class UsersService {
         .getOne();
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Something went wrong when trying to fetch the user.',
+        message: ['Something went wrong when trying to fetch the user.'],
       });
     }
     if (!user) {
-      throw new NotFoundException({ message: 'The user was not found.' });
+      throw new NotFoundException({ message: ['The user was not found.'] });
     }
     return user;
   }
@@ -244,7 +255,9 @@ export class UsersService {
   ): Promise<string> {
     const currentUser = await this.getUserForUid(uid);
     if (!currentUser) {
-      throw new NotFoundException({ message: 'The user could not be found.' });
+      throw new NotFoundException({
+        message: ['The user could not be found.'],
+      });
     }
 
     const md5UserUid = crypto
@@ -307,7 +320,9 @@ export class UsersService {
   async deleteAvatar(uid: string) {
     const currentUser = await this.getUserForUid(uid);
     if (!currentUser) {
-      throw new NotFoundException({ message: 'The user could not be found.' });
+      throw new NotFoundException({
+        message: ['The user could not be found.'],
+      });
     }
 
     const md5UserUid = crypto
@@ -348,8 +363,9 @@ export class UsersService {
       const practitioners = await user.favoritePractitioners;
       if (practitioners.length >= 25) {
         throw new BadRequestException({
-          message:
+          message: [
             'The limit for favorite practitioners has already been reached.',
+          ],
         });
       }
       const favPractitioner = new Practitioner();
@@ -361,7 +377,7 @@ export class UsersService {
       await this.userRepository.save(user);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: "Could not add the practitioner to user's favorites.",
+        message: ["Could not add the practitioner to user's favorites."],
       });
     }
   }
@@ -383,7 +399,7 @@ export class UsersService {
       await this.userRepository.save(user);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: "Could not remove the practitioner from user's favorites.",
+        message: ["Could not remove the practitioner from user's favorites."],
       });
     }
   }

@@ -33,8 +33,9 @@ export class PractitionerSchedulesService {
       return await this.schedulesRepository.save(schedules);
     } catch (error) {
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Something went wrong while trying to insert the schedule values',
+        ],
         error: error,
       });
     }
@@ -71,8 +72,9 @@ export class PractitionerSchedulesService {
 
           if (currentScheduleInterval.overlaps(selectedScheduleInteval)) {
             throw new UnprocessableEntityException({
-              message:
+              message: [
                 'In the schedule collection times for the same day cannot overlap.',
+              ],
             });
           }
         });
@@ -86,8 +88,9 @@ export class PractitionerSchedulesService {
       return await this.schedulesRepository.save(schedules);
     } catch (error) {
       throw new InternalServerErrorException({
-        message:
+        message: [
           'Something went wrong while trying to insert the schedule values',
+        ],
       });
     }
   }
@@ -104,7 +107,7 @@ export class PractitionerSchedulesService {
       );
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Could not retrieve the schedules from the database',
+        message: ['Could not retrieve the schedules from the database'],
       });
     }
   }

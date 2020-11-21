@@ -42,7 +42,7 @@ export class AppointmentsService {
     });
     if (appointmentStartTime < DateTime.utc()) {
       throw new BadRequestException({
-        message: 'The start time cannot be before the current time.',
+        message: ['The start time cannot be before the current time.'],
       });
     }
 
@@ -122,8 +122,9 @@ export class AppointmentsService {
       );
       if (prevDaySchedules.length == 0) {
         throw new BadRequestException({
-          message:
+          message: [
             'Could not create an appointment because there is no schedule stored for that day of the week.',
+          ],
         });
       }
       // check if the found schedules for the selected
@@ -139,8 +140,9 @@ export class AppointmentsService {
 
       if (!timesFitPreviousDayOfWeek) {
         throw new UnprocessableEntityException({
-          message:
+          message: [
             'Could not add appointment as it does not fit any of the available schedules.',
+          ],
         });
       }
     }
@@ -185,7 +187,7 @@ export class AppointmentsService {
 
     if (overlappingAppointment) {
       throw new UnprocessableEntityException({
-        message: 'The appointment overlaps with other existing appointments.',
+        message: ['The appointment overlaps with other existing appointments.'],
       });
     }
 
@@ -215,7 +217,7 @@ export class AppointmentsService {
       newAppointment = await this.appointmentRepository.save(newAppointment);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Could not create the appointment.',
+        message: ['Could not create the appointment.'],
       });
     }
     // create email event for the practitioner and for the user
@@ -252,8 +254,9 @@ export class AppointmentsService {
   ) {
     if (!cancellationReason || cancellationReason.trim().length < 40) {
       throw new BadRequestException({
-        message:
+        message: [
           'The cancellation reason can not be empty or contain less than 40 characters.',
+        ],
       });
     }
 
@@ -262,7 +265,7 @@ export class AppointmentsService {
       appointment = await this.appointmentRepository.findOne(id);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'Could not fetch the appointment from the store.',
+        message: ['Could not fetch the appointment from the store.'],
       });
     }
 
@@ -271,8 +274,9 @@ export class AppointmentsService {
       DateTime.fromJSDate(appointment.startTime).plus({ hours: -2 })
     ) {
       throw new UnprocessableEntityException({
-        message:
+        message: [
           'Cannot cancel an appointment later than 2 hours before the appointment.',
+        ],
       });
     }
 
@@ -281,7 +285,7 @@ export class AppointmentsService {
       appointment.statusId != APPOINTMENT_STATUS.Pending
     ) {
       throw new UnprocessableEntityException({
-        message: 'Cannot cancel this type of appointment.',
+        message: ['Cannot cancel this type of appointment.'],
       });
     }
 

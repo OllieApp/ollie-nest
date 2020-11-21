@@ -26,7 +26,7 @@ export class WherebyMeetingsService {
         .toPromise();
       if (res.status != HttpStatus.CREATED) {
         throw new InternalServerErrorException({
-          message: 'Could not generate the Whereby meeting.',
+          message: ['Could not generate the Whereby meeting.'],
         });
       }
       return res.data as Meeting;
@@ -51,7 +51,7 @@ export class WherebyMeetingsService {
         .toPromise();
       if (res.status != HttpStatus.OK) {
         throw new InternalServerErrorException({
-          message: 'Could not get the Whereby meeting.',
+          message: ['Could not get the Whereby meeting.'],
         });
       }
       return res.data as Meeting;
@@ -75,7 +75,7 @@ export class WherebyMeetingsService {
         .toPromise();
       if (res.status != HttpStatus.NO_CONTENT) {
         throw new InternalServerErrorException({
-          message: 'Could not delete the Whereby meeting.',
+          message: ['Could not delete the Whereby meeting.'],
         });
       }
       return true;

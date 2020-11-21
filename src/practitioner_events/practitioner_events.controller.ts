@@ -49,7 +49,7 @@ export class PractitionerEventsController {
       !userPractitionersIds.some(id => id == createEventRequest.practitionerId)
     ) {
       throw new NotFoundException({
-        message: 'The practitioner could not be found.',
+        message: ['The practitioner could not be found.'],
       });
     }
 
@@ -88,7 +88,9 @@ export class PractitionerEventsController {
     );
 
     if (!practitionerId) {
-      throw new NotFoundException({ message: 'The event could not be found.' });
+      throw new NotFoundException({
+        message: ['The event could not be found.'],
+      });
     }
 
     const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
@@ -97,7 +99,7 @@ export class PractitionerEventsController {
 
     if (!userPractitionersIds.some(id => id == practitionerId)) {
       throw new ForbiddenException({
-        message: `You do not have access to the event.`,
+        message: [`You do not have access to the event.`],
       });
     }
 
@@ -118,7 +120,9 @@ export class PractitionerEventsController {
     );
 
     if (!practitionerId) {
-      throw new NotFoundException({ message: 'The event could not be found.' });
+      throw new NotFoundException({
+        message: ['The event could not be found.'],
+      });
     }
 
     const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
@@ -127,7 +131,7 @@ export class PractitionerEventsController {
 
     if (!userPractitionersIds.some(id => id == practitionerId)) {
       throw new ForbiddenException({
-        message: `You do not have access to the event.`,
+        message: [`You do not have access to the event.`],
       });
     }
 

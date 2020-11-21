@@ -140,7 +140,9 @@ export class AppointmentsController {
     );
     if (!appointment) {
       throw new NotFoundException({
-        message: 'The appointment could not be found in the appointment store.',
+        message: [
+          'The appointment could not be found in the appointment store.',
+        ],
       });
     }
     const practitionerIds = await this.practitionersService.getPractitionersIdsForUserId(
@@ -153,7 +155,9 @@ export class AppointmentsController {
       // if the user is not the practitioner nor the patient, we send a not found
       // as the user doesn't have access to the appointment
       throw new NotFoundException({
-        message: 'The appointment could not be found in the appointment store.',
+        message: [
+          'The appointment could not be found in the appointment store.',
+        ],
       });
     }
     await this.appointmentsService.cancelAppointment(
