@@ -10,6 +10,8 @@ import {
   Post,
   Request,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PractitionersService } from './services/practitioners.service';
 import {
@@ -37,6 +39,7 @@ export class PractitionersController {
 
   @Post()
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async create(
     @Request() req,
     @Body() createPractitionerDto: CreatePractitionerRequest,
@@ -172,6 +175,7 @@ export class PractitionersController {
 
   @Patch('/:id')
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async update(
     @Request() req,
     @Param('id') practitionerId: string,
