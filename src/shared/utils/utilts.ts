@@ -13,6 +13,8 @@ export function mapPractitionerCategoryToString(
       return 'Psychologist';
     case PRACTITIONER_CATEGORY.WellnessHub:
       return 'Wellness hub';
+    case PRACTITIONER_CATEGORY.Biokineticist:
+      return 'Biokineticist';
     default:
       return 'Practitioner category';
   }

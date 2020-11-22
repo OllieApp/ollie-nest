@@ -4,4 +4,5 @@ export enum PRACTITIONER_CATEGORY {
   Gynecologist = 3,
   Physiotherapist = 4,
   WellnessHub = 5,
+  Biokineticist = 6,
 }
