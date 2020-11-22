@@ -1,14 +1,23 @@
-import { IsDate } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsISO8601,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateAppointmentRequest {
+  @IsNotEmpty()
   public practitionerId: string;
 
+  @IsOptional()
+  @MaxLength(300)
   public userNotes?: string;
 
-  @Type(() => Date)
-  @IsDate()
-  public startTime: Date;
+  @IsISO8601()
+  public startTime: string;
 
+  @IsNotEmpty()
+  @IsBoolean()
   public isVirtual: boolean;
 }

@@ -8,6 +8,8 @@ import {
   Request,
   Param,
   NotFoundException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppointmentDto } from './dto/appointment.dto';
@@ -30,6 +32,7 @@ export class AppointmentsController {
 
   @Post()
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async createAppointment(
     @Request() req,
     @Body() createAppointmentRequest: CreateAppointmentRequest,
@@ -127,6 +130,7 @@ export class AppointmentsController {
 
   @Post('/:id/cancel')
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async cancelAppointment(
     @Request() req,
     @Body() cancelAppointmentRequest: CancelAppointmentRequest,
