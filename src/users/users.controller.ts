@@ -18,6 +18,8 @@ import {
   UnauthorizedException,
   ForbiddenException,
   Delete,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-auth';
@@ -57,6 +59,7 @@ export class UsersController {
 
   @Post()
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async create(
     @Request() req,
     @Body() createUserDto: CreateUserRequest,
@@ -80,6 +83,7 @@ export class UsersController {
   // Might be a good idea to return the updated user
   @Patch()
   @UseGuards(AuthGuard('firebase'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async update(@Request() req, @Body() updateUserDto: UpdateUserRequest) {
     const firebaseUser = req.user as FirebaseUser;
     await this.usersService.update(updateUserDto, firebaseUser.uid);
