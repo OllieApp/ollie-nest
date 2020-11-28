@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
 
@@ -33,7 +34,7 @@ export class UpdateUserRequest {
   medicalAidPlan?: string;
 
   @IsOptional()
-  @IsNotEmpty()
+  @ValidateIf(o => o.phone.length !== 0)
   @IsPhoneNumber('ZZ')
   phone?: string;
 
