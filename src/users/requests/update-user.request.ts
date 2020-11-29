@@ -34,7 +34,7 @@ export class UpdateUserRequest {
   medicalAidPlan?: string;
 
   @IsOptional()
-  @ValidateIf(o => o.phone.length !== 0)
+  @ValidateIf(o => o.phone?.length !== 0)
   @IsPhoneNumber('ZZ')
   phone?: string;
 
