@@ -144,12 +144,12 @@ export class UsersService {
         message: ['The user could not be found.'],
       });
     }
-    if (updatedUser.firstName?.trim().length == 0) {
+    if (updatedUser.firstName?.trim().length < 2) {
       throw new BadRequestException({
         message: ['The first name of the user cannot be empty.'],
       });
     }
-    if (updatedUser.lastName?.trim().length == 0) {
+    if (updatedUser.lastName?.trim().length < 2) {
       throw new BadRequestException({
         message: ['The last name of the user cannot be empty.'],
       });
@@ -157,7 +157,7 @@ export class UsersService {
     if (updatedUser.medicalAid && !(updatedUser.medicalAid in MEDICAL_AID)) {
       throw new BadRequestException({
         message: [
-          'The provided medical aid is not in the supported medical aid range.',
+          'The provided medical aid does not exist in our medical aids list.',
         ],
       });
     }
@@ -171,15 +171,8 @@ export class UsersService {
         ],
       });
     }
-    if (!(updatedUser.medicalAid in MEDICAL_AID)) {
-      throw new BadRequestException({
-        message: [
-          'The provided medical aid does not exist in our medical aids list.',
-        ],
-      });
-    }
     try {
-      const removeEmpty = (obj: any) => {
+      const removeNullValues = (obj: any) => {
         Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
       };
 
@@ -196,7 +189,7 @@ export class UsersService {
         phone: updatedUser.phone?.trim() ?? undefined,
       };
 
-      removeEmpty(updateObject);
+      removeNullValues(updateObject);
 
       await this.userRepository.update({ uid: uid }, updateObject);
       if (updateObject.firstName || updateObject.lastName) {
