@@ -136,25 +136,30 @@ export class UsersService {
     return user;
   }
 
-  async update(updatedUser: UpdateUserRequest, uid: string) {
+  async update(request: UpdateUserRequest, uid: string) {
     const user = await this.getUserForUid(uid);
+    const isRequestEmpty = !Object.values(request).some(x => x !== null);
+
+    if (Object.values(request).length < 1 && isRequestEmpty) {
+      return;
+    }
 
     if (!user) {
       throw new NotFoundException({
         message: ['The user could not be found.'],
       });
     }
-    if (updatedUser.firstName?.trim().length < 2) {
+    if (request.firstName?.trim().length < 2) {
       throw new BadRequestException({
         message: ['The first name of the user cannot be empty.'],
       });
     }
-    if (updatedUser.lastName?.trim().length < 2) {
+    if (request.lastName?.trim().length < 2) {
       throw new BadRequestException({
         message: ['The last name of the user cannot be empty.'],
       });
     }
-    if (updatedUser.medicalAid && !(updatedUser.medicalAid in MEDICAL_AID)) {
+    if (request.medicalAid && !(request.medicalAid in MEDICAL_AID)) {
       throw new BadRequestException({
         message: [
           'The provided medical aid does not exist in our medical aids list.',
@@ -162,8 +167,8 @@ export class UsersService {
       });
     }
     if (
-      updatedUser.countryCode?.trim() &&
-      !Object.values(COUNTRY_CODE).find(e => e == updatedUser.countryCode)
+      request.countryCode?.trim() &&
+      !Object.values(COUNTRY_CODE).find(e => e == request.countryCode)
     ) {
       throw new BadRequestException({
         message: [
@@ -177,16 +182,16 @@ export class UsersService {
       };
 
       const updateObject = {
-        firstName: updatedUser.firstName?.trim() ?? undefined,
-        lastName: updatedUser.lastName?.trim() ?? undefined,
-        city: updatedUser.city?.trim() ?? undefined,
-        address: updatedUser.address?.trim() ?? undefined,
-        countryCode: updatedUser.countryCode?.trim() ?? undefined,
-        medicalAidNumber: updatedUser.medicalAidNumber?.trim() ?? undefined,
-        medicalAidPlan: updatedUser.medicalAidPlan?.trim() ?? undefined,
-        medicalAidId: updatedUser.medicalAid ?? undefined,
-        zipCode: updatedUser.zipCode?.trim() ?? undefined,
-        phone: updatedUser.phone?.trim() ?? undefined,
+        firstName: request.firstName?.trim() ?? undefined,
+        lastName: request.lastName?.trim() ?? undefined,
+        city: request.city?.trim() ?? undefined,
+        address: request.address?.trim() ?? undefined,
+        countryCode: request.countryCode?.trim() ?? undefined,
+        medicalAidNumber: request.medicalAidNumber?.trim() ?? undefined,
+        medicalAidPlan: request.medicalAidPlan?.trim() ?? undefined,
+        medicalAidId: request.medicalAid ?? undefined,
+        zipCode: request.zipCode?.trim() ?? undefined,
+        phone: request.phone?.trim() ?? undefined,
       };
 
       removeNullValues(updateObject);
