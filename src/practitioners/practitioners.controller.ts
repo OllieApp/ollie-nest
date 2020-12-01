@@ -86,12 +86,13 @@ export class PractitionersController {
         })),
         category: practitioner.category.id,
         medicalAids: practitioner.medicalAids?.map(m => m.id),
-        location: practitioner.location
-          ? {
-              latitude: practitioner.location.bbox[0],
-              longitude: practitioner.location.bbox[1],
-            }
-          : null,
+        location:
+          practitioner.location && practitioner.location.bbox
+            ? {
+                latitude: practitioner.location.bbox[0],
+                longitude: practitioner.location.bbox[1],
+              }
+            : null,
         languages: practitioner.languages.map(l => l.id),
       });
     }
