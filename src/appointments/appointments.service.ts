@@ -192,7 +192,7 @@ export class AppointmentsService {
     }
 
     if (
-      this.practitionerEventsService.isIntervalOverlappingAnyEvent(
+      await this.practitionerEventsService.isIntervalOverlappingAnyEvent(
         practitionerId,
         appointmentStartTime.toUTC(),
         appointmentEndTime.toUTC(),
