@@ -69,9 +69,10 @@ export class PractitionerEventsService {
         eventEndTime = eventStartTime.plus({ days: 1 });
       }
 
-      eventEndTime = eventEndTime
-        .set({ hour: eventStartTime.hour, minute: eventStartTime.minute })
-        .minus({ seconds: 1 } as Duration);
+      eventEndTime = eventEndTime.set({
+        hour: eventStartTime.hour,
+        minute: eventStartTime.minute,
+      });
 
       event.startTime = eventStartTime.toJSDate();
       event.endTime = eventEndTime.toJSDate();
@@ -155,7 +156,7 @@ export class PractitionerEventsService {
         })
         .limit(1)
         .getOne();
-      return overlappingConfirmedEvent ? true : false;
+      return Boolean(overlappingConfirmedEvent);
     } catch (error) {
       // LOG failure to check events
       throw new InternalServerErrorException({
@@ -221,9 +222,10 @@ export class PractitionerEventsService {
         eventEndTime = eventStartTime.plus({ days: 1 });
       }
 
-      eventEndTime = eventEndTime
-        .set({ hour: eventStartTime.hour, minute: eventStartTime.minute })
-        .minus({ seconds: 1 } as Duration);
+      eventEndTime = eventEndTime.set({
+        hour: eventStartTime.hour,
+        minute: eventStartTime.minute,
+      });
 
       event.startTime = eventStartTime.toJSDate();
       event.endTime = eventEndTime.toJSDate();
