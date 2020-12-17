@@ -36,15 +36,11 @@ export class PractitionerEventsService {
       location,
     } = request;
 
-    const eventStartTime = DateTime.fromISO(startTime).toUTC();
+    let eventStartTime = DateTime.fromISO(startTime).toUTC();
     let eventEndTime = DateTime.fromISO(endTime).toUTC();
 
     if (eventStartTime < DateTime.utc()) {
-      throw new BadRequestException({
-        message: [
-          'The start time of the event can not be before the current date and time.',
-        ],
-      });
+      eventStartTime = DateTime.utc();
     }
     if (eventEndTime <= eventStartTime) {
       throw new BadRequestException({
