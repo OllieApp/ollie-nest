@@ -62,7 +62,7 @@ export class PractitionerEventsService {
 
     if (isAllDay) {
       if (eventEndTime.startOf('day') <= eventStartTime.startOf('day')) {
-        eventEndTime = eventStartTime.plus({ days: 1 });
+        eventEndTime = eventStartTime.startOf('hour').plus({ days: 1 });
       }
 
       eventEndTime = eventEndTime.set({
