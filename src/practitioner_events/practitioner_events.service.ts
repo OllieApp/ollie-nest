@@ -62,7 +62,11 @@ export class PractitionerEventsService {
 
     if (isAllDay) {
       if (eventEndTime.startOf('day') <= eventStartTime.startOf('day')) {
-        eventEndTime = eventStartTime.startOf('hour').plus({ days: 1 });
+        throw new UnprocessableEntityException({
+          message: [
+            'The start date of the event can not be the same as the end date of the event.',
+          ],
+        });
       }
 
       eventEndTime = eventEndTime.set({
