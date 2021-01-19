@@ -14,6 +14,8 @@ import {
 } from '@tfarras/nestjs-firebase-admin';
 import * as admin from 'firebase-admin';
 import { PractitionerEventsModule } from './practitioner_events/practitioner_events.module';
+import { LoggingInterceptor } from '@algoan/nestjs-logging-interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core/constants';
 
 @Module({
   imports: [
@@ -36,6 +38,15 @@ import { PractitionerEventsModule } from './practitioner_events/practitioner_eve
     PractitionerEventsModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useFactory: () => {
+        const interceptor: LoggingInterceptor = new LoggingInterceptor();
+        interceptor.setUserPrefix('Ollie Nest');
+        return interceptor;
+      },
+    },
+  ],
 })
 export class AppModule {}
