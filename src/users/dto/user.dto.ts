@@ -1,6 +1,5 @@
-import { Exclude, Expose } from 'class-transformer/decorators';
+import { Expose } from 'class-transformer/decorators';
 import { MEDICAL_AID } from '../../medical_aids/models/medical_aid.model';
-@Exclude()
 export class UserDto {
   @Expose()
   id: string;
