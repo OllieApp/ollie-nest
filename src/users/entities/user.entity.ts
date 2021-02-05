@@ -15,6 +15,7 @@ import {
 } from 'typeorm';
 import MedicalAid from '../../medical_aids/entities/medical_aid.entity';
 import PractitionerEvent from 'src/practitioner_events/entities/practitioner_event.entity';
+import PushNotificationToken from './push-notification-token.entity';
 
 @Entity('user')
 class User {
@@ -166,6 +167,17 @@ class User {
     { eager: false },
   )
   public updatedPractitionerEvents: Promise<PractitionerEvent[]>;
+
+  @OneToMany(
+    type => PushNotificationToken,
+    pntoken => pntoken.user,
+    { eager: false },
+  )
+  public pushNotificationTokens: Promise<PushNotificationToken[]>;
+
+  // create notifications packages, like basic notifications, extra notifications, promotions notifications
+  @Column({ type: 'boolean', name: 'app_notifications_enabled' })
+  public appNotificationsEnabled: boolean;
 }
 
 export default User;
