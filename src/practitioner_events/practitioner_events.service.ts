@@ -39,9 +39,6 @@ export class PractitionerEventsService {
     let eventStartTime = DateTime.fromISO(startTime).toUTC();
     let eventEndTime = DateTime.fromISO(endTime).toUTC();
 
-    if (eventStartTime < DateTime.utc()) {
-      eventStartTime = DateTime.utc();
-    }
     if (eventEndTime <= eventStartTime) {
       throw new BadRequestException({
         message: [
