@@ -73,6 +73,19 @@ class ExtrasService {
       });
     }
 
+    const testingTypesTotal =
+      testingTypesCount.pctCount +
+      testingTypesCount.antibodyCount +
+      testingTypesCount.antigenCount;
+
+    if (numberOfPeople !== testingTypesTotal) {
+      throw new BadRequestException({
+        message: [
+          'The sum of each type of Covid testing has to equal to the inputted number of people.',
+        ],
+      });
+    }
+
     // save the data into the database
     let covidTestingEntity = new CovidTestingRequest();
     covidTestingEntity.fullName = fullName;
