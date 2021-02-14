@@ -1,3 +1,4 @@
+import { ExtrasModule } from './extras/extras.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { PractitionersModule } from './practitioners/practitioners.module';
@@ -36,6 +37,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core/constants';
     AppointmentsModule,
     ReviewsModule,
     PractitionerEventsModule,
+    ExtrasModule,
   ],
   controllers: [AppController],
   providers: [
