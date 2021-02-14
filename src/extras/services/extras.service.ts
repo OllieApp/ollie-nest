@@ -1,5 +1,9 @@
 import { Logger } from '@nestjs/common/services/logger.service';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   GoogleSpreadsheet,
@@ -56,9 +60,18 @@ class ExtrasService {
       notes,
     } = request;
 
-    const preferredDate = DateTime.fromISO(date, {
-      zone: 'Africa/Johannesburg',
-    }).startOf('day');
+    const preferredDate = DateTime.fromISO(date)
+      .setZone('Africa/Johannesburg')
+      .startOf('day');
+
+    if (
+      preferredDate <
+      new DateTime().setZone('Africa/Johannesburg').startOf('day')
+    ) {
+      throw new BadRequestException({
+        message: ['The selected date for the testing can not be in the past.'],
+      });
+    }
 
     // save the data into the database
     let covidTestingEntity = new CovidTestingRequest();
