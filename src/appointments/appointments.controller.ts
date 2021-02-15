@@ -10,6 +10,7 @@ import {
   NotFoundException,
   UsePipes,
   ValidationPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppointmentDto } from './dto/appointment.dto';
@@ -39,18 +40,21 @@ export class AppointmentsController {
   ): Promise<AppointmentDto> {
     const firebaseUser = req.user as FirebaseUser;
     const user = await this.usersService.getUserForUid(firebaseUser.uid);
-    const appointmentTimeSlot = (
-      await this.practitionersService.getPractitionerById(
-        createAppointmentRequest.practitionerId,
-      )
-    ).appointmentTimeSlot;
+    const practitioner = await this.practitionersService.getPractitionerById(
+      createAppointmentRequest.practitionerId,
+    );
+
+    if (!practitioner.isActive) {
+      throw new BadRequestException({
+        message: ['The practitioner you are trying to book is not active.'],
+      });
+    }
+
+    const appointmentTimeSlot = practitioner.appointmentTimeSlot;
     const appointment = await this.appointmentsService.createAppointment(
       user.id,
       createAppointmentRequest,
       appointmentTimeSlot,
-    );
-    const practitioner = await this.practitionersService.getPractitionerById(
-      createAppointmentRequest.practitionerId,
     );
 
     await this.emailService.sendPractitionerAppointmentReceived(
