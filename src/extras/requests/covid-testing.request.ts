@@ -3,15 +3,16 @@ import {
   IsDefined,
   IsEmail,
   IsISO8601,
-  IsNotEmpty,
   IsNotEmptyObject,
   IsNumber,
+  IsObject,
   IsOptional,
   IsPhoneNumber,
   IsString,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { NextPathologyTestingTypesCount } from './next-path-testing-types-count';
 
 export class CovidTestingNextPathologyRequest {
   @IsString()
@@ -39,18 +40,8 @@ export class CovidTestingNextPathologyRequest {
 
   @IsDefined()
   @IsNotEmptyObject()
+  @IsObject()
   @ValidateNested()
   @Type(() => NextPathologyTestingTypesCount)
   public testingTypesCount!: NextPathologyTestingTypesCount;
-}
-
-class NextPathologyTestingTypesCount {
-  @IsNumber()
-  public pctCount: number;
-
-  @IsNumber()
-  public antigenCount: number;
-
-  @IsNumber()
-  public antibodyCount: number;
 }

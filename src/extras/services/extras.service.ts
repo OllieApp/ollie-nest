@@ -32,8 +32,10 @@ class ExtrasService {
         process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PATH,
       );
       this.credentials = JSON.parse(buffer.toString());
-      if (!!this.credentials.client_email || !!this.credentials.private_key) {
-        throw new Error();
+      if (!this.credentials.client_email || !this.credentials.private_key) {
+        throw new Error(
+          'The credentials for the service account were not loaded',
+        );
       }
     } catch (error) {
       this.logger.error(
@@ -66,7 +68,9 @@ class ExtrasService {
 
     if (
       preferredDate <
-      new DateTime().setZone('Africa/Johannesburg').startOf('day')
+      DateTime.utc()
+        .setZone('Africa/Johannesburg')
+        .startOf('day')
     ) {
       throw new BadRequestException({
         message: ['The selected date for the testing can not be in the past.'],
@@ -133,16 +137,22 @@ class ExtrasService {
       });
     }
 
+    const formattedCreatedDate = DateTime.fromJSDate(
+      covidTestingEntity.createdAt,
+    )
+      .setZone('Africa/Johannesburg')
+      .toFormat('dd.MM.yyyy t');
+
     try {
       const sheet = doc.sheetsByIndex[0];
       await sheet.addRow([
-        covidTestingEntity.createdAt.toISOString(),
+        formattedCreatedDate,
         fullName,
         email,
         phoneNumber,
         fullAddress,
         numberOfPeople,
-        preferredDate.toFormat('dd.MM.YYYY'),
+        preferredDate.toFormat('dd.MM.yyyy'),
         testingTypesCount.pctCount,
         testingTypesCount.antigenCount,
         testingTypesCount.antibodyCount,
