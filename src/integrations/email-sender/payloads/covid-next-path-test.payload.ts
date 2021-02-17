@@ -3,7 +3,7 @@ export interface CovidNextPathTestPayload {
   fullAddress: string;
   email: string;
   phoneNumber: string;
-  numberOfPeople: string;
+  numberOfPeople: number;
   notes?: string;
   createdDate: string;
   date: string;
