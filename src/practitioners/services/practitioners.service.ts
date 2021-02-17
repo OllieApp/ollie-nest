@@ -127,13 +127,10 @@ export class PractitionersService {
     }
   }
 
-  async getPractitionerById(
-    practitionerId: string,
-  ): Promise<Practitioner | null> {
+  async getPractitionerById(practitionerId: string): Promise<Practitioner> {
+    let practitioner: Practitioner | null | undefined;
     try {
-      return (
-        (await this.practitionerRepository.findOne(practitionerId)) ?? null
-      );
+      practitioner = await this.practitionerRepository.findOne(practitionerId);
     } catch (error) {
       throw new InternalServerErrorException({
         message: [
@@ -141,6 +138,12 @@ export class PractitionersService {
         ],
       });
     }
+    if (!practitioner) {
+      throw new NotFoundException({
+        message: ['The practitioner could not be found'],
+      });
+    }
+    return practitioner;
   }
 
   async updatePractitioner(
