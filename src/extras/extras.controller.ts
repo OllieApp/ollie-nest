@@ -32,7 +32,7 @@ export class ExtrasController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    const covidTestReq = await this.extrasService.requestCovidTestingWithNextPath(
+    const covidTestEntry = await this.extrasService.requestCovidTestingWithNextPath(
       userId,
       covidTestingReq,
     );
@@ -48,7 +48,7 @@ export class ExtrasController {
       phone,
       testingTypesCount,
       notes,
-    } = covidTestReq;
+    } = covidTestEntry;
 
     await this.emailService.sendCovidNextPathTestNotification({
       email: email,
