@@ -19,8 +19,6 @@ import { PractitionersService } from 'src/practitioners/services/practitioners.s
 import { UsersService } from '../users/users.service';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-admin';
 import { CancelAppointmentRequest } from './requests/cancel-appointment.request';
-import { PRACTITIONER_CATEGORY } from 'src/practitioners/dto/category.dto';
-import { use } from 'passport';
 
 @Controller('/appointments')
 export class AppointmentsController {
