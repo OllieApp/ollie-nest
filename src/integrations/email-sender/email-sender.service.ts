@@ -347,7 +347,11 @@ export class EmailSenderService {
     };
 
     await this.sendgrid.send({
-      to: ['jacky.maulgue@nextbio.co.za', 'bespoke@nextbio.co.za'],
+      to: [
+        'jacky.maulgue@nextbio.co.za',
+        'bespoke@nextbio.co.za',
+        'marc@ollie.health',
+      ],
       from: ollieSendFromEmail,
       templateId: TemplateIds.covidNextPathTestNotification,
       dynamicTemplateData: templateData,
