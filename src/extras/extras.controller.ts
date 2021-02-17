@@ -32,11 +32,36 @@ export class ExtrasController {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    await this.extrasService.requestCovidTestingWithNextPath(
+    const covidTestReq = await this.extrasService.requestCovidTestingWithNextPath(
       userId,
       covidTestingReq,
     );
 
-    // send emails to next path
+    const {
+      createdAt,
+      date,
+      email,
+      fullAddress,
+      fullName,
+      id,
+      numberOfPeople,
+      phone,
+      testingTypesCount,
+      notes,
+    } = covidTestReq;
+
+    await this.emailService.sendCovidNextPathTestNotification({
+      email: email,
+      fullAddress: fullAddress,
+      fullName: fullName,
+      phoneNumber: phone,
+      notes: notes,
+      numberOfPeople: numberOfPeople,
+      date: date,
+      createdDate: createdAt,
+      antibodyCount: testingTypesCount.pctTestingCount,
+      antigenCount: testingTypesCount.antigenTestingCount,
+      pctCount: testingTypesCount.pctTestingCount,
+    });
   }
 }
