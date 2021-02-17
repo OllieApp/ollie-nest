@@ -50,7 +50,7 @@ class ExtrasService {
   async requestCovidTestingWithNextPath(
     userId: string,
     request: CovidTestingNextPathologyRequest,
-  ): Promise<void> {
+  ): Promise<CovidTestingRequest> {
     const {
       date,
       email,
@@ -166,6 +166,7 @@ class ExtrasService {
         message: ['Something went wrong while trying to process your request.'],
       });
     }
+    return covidTestingEntity;
   }
 }
 

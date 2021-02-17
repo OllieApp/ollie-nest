@@ -1,3 +1,5 @@
+import { CovidNextPathTestPayload } from './payloads/covid-next-path-test.payload';
+import { CovidNextPathTestRequest } from './requests/covid-next-path-test.request';
 import { InternalAppointmentCreatedPayload } from './payloads/internal-appointment-created.payload';
 import { InternalAppointmentCreatedRequest } from './requests/internal-appointment-created.request';
 import { UserAppointmentCancelledConfirmationPayload } from './payloads/user-appointment-cancelled-confirmation.payload';
@@ -78,6 +80,7 @@ export class EmailSenderService {
       dynamicTemplateData: templateData,
     });
   }
+
   async sendPractitionerAppointmentReceived(
     practitionerEmail: string,
     request: PractitionerAppointmentReceivedRequest,
@@ -109,6 +112,7 @@ export class EmailSenderService {
       dynamicTemplateData: templateData,
     });
   }
+
   async sendUserAppointmentCancelledByPractitioner(
     userEmail: string,
     request: UserAppointmentCancelledByPractitionerRequest,
@@ -301,6 +305,51 @@ export class EmailSenderService {
       to: ['marc@ollie.health', 'cameron@ollie.health'],
       from: ollieSendFromEmail,
       templateId: TemplateIds.internalAppointmentCreated,
+      dynamicTemplateData: templateData,
+    });
+  }
+
+  async sendCovidNextPathTestNotification(request: CovidNextPathTestRequest) {
+    const {
+      antibodyCount,
+      antigenCount,
+      createdDate,
+      date,
+      email,
+      fullAddress,
+      fullName,
+      numberOfPeople,
+      pctCount,
+      phoneNumber,
+      notes,
+    } = request;
+    const preferredDate = DateTime.fromJSDate(date).setZone(
+      'Africa/Johannesburg',
+    );
+    const creationDate = DateTime.fromJSDate(createdDate).setZone(
+      'Africa/Johannesburg',
+    );
+
+    const templateData: CovidNextPathTestPayload = {
+      createdDate: creationDate.toFormat('dd.MM.yyyy t'),
+      date: preferredDate.toFormat('dd.MM.yyyy'),
+      email: email,
+      fullAddress: fullAddress,
+      fullName: fullName,
+      numberOfPeople: numberOfPeople,
+      phoneNumber: phoneNumber,
+      notes: notes,
+      testingTypesCount: {
+        pctCount: pctCount,
+        antibodyCount: antibodyCount,
+        antigenCount: antigenCount,
+      },
+    };
+
+    await this.sendgrid.send({
+      to: ['jacky.maulgue@nextbio.co.za', 'bespoke@nextbio.co.za'],
+      from: ollieSendFromEmail,
+      templateId: TemplateIds.covidNextPathTestNotification,
       dynamicTemplateData: templateData,
     });
   }

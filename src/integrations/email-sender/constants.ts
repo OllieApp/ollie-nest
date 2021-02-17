@@ -19,6 +19,8 @@ export class TemplateIds {
     'd-917bea7de13d4859b46e5be6e9f78c35';
   static readonly internalAppointmentCreated =
     'd-8135a6fbc91f4bbdbaae47c953c397ee';
+  static readonly covidNextPathTestNotification =
+    'd-ae07c04083d44286a756c2b6a74fb5b4';
 }
 export const timeFormat = 't';
 export const weekdayFormat = 'cccc';
