@@ -2,7 +2,7 @@ import { IsNumber } from 'class-validator';
 
 export class NextPathologyTestingTypesCount {
   @IsNumber()
-  public pctCount: number;
+  public pcrCount: number;
 
   @IsNumber()
   public antigenCount: number;

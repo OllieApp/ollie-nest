@@ -319,7 +319,7 @@ export class EmailSenderService {
       fullAddress,
       fullName,
       numberOfPeople,
-      pctCount,
+      pcrCount,
       phoneNumber,
       notes,
     } = request;
@@ -340,7 +340,7 @@ export class EmailSenderService {
       phoneNumber: phoneNumber,
       notes: notes,
       testingTypesCount: {
-        pctCount: pctCount,
+        pcrCount: pcrCount,
         antibodyCount: antibodyCount,
         antigenCount: antigenCount,
       },

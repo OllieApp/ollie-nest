@@ -1,5 +1,5 @@
 export interface NextPathologyCovidTestingCount {
-  pctTestingCount: number;
+  pcrTestingCount: number;
   antigenTestingCount: number;
   antibodyTestingCount: number;
 }

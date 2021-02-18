@@ -78,7 +78,7 @@ class ExtrasService {
     }
 
     const testingTypesTotal =
-      testingTypesCount.pctCount +
+      testingTypesCount.pcrCount +
       testingTypesCount.antibodyCount +
       testingTypesCount.antigenCount;
 
@@ -98,7 +98,7 @@ class ExtrasService {
     covidTestingEntity.fullAddress = fullAddress;
     covidTestingEntity.numberOfPeople = numberOfPeople;
     covidTestingEntity.testingTypesCount = {
-      pctTestingCount: testingTypesCount.pctCount,
+      pcrTestingCount: testingTypesCount.pcrCount,
       antigenTestingCount: testingTypesCount.antigenCount,
       antibodyTestingCount: testingTypesCount.antibodyCount,
     };
@@ -153,7 +153,7 @@ class ExtrasService {
         fullAddress,
         numberOfPeople,
         preferredDate.toFormat('dd.MM.yyyy'),
-        testingTypesCount.pctCount,
+        testingTypesCount.pcrCount,
         testingTypesCount.antigenCount,
         testingTypesCount.antibodyCount,
         notes ?? '',

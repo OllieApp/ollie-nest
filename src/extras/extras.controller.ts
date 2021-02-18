@@ -50,7 +50,7 @@ export class ExtrasController {
       notes,
     } = covidTestEntry;
 
-    await this.emailService.sendCovidNextPathTestNotification({
+    this.emailService.sendCovidNextPathTestNotification({
       email: email,
       fullAddress: fullAddress,
       fullName: fullName,
@@ -59,9 +59,9 @@ export class ExtrasController {
       numberOfPeople: numberOfPeople,
       date: date,
       createdDate: createdAt,
-      antibodyCount: testingTypesCount.pctTestingCount,
+      antibodyCount: testingTypesCount.antibodyTestingCount,
       antigenCount: testingTypesCount.antigenTestingCount,
-      pctCount: testingTypesCount.pctTestingCount,
+      pcrCount: testingTypesCount.pcrTestingCount,
     });
   }
 }

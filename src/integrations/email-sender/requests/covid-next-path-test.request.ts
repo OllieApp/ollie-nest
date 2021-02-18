@@ -7,7 +7,7 @@ export interface CovidNextPathTestRequest {
   notes?: string;
   createdDate: Date;
   date: Date;
-  pctCount: number;
+  pcrCount: number;
   antigenCount: number;
   antibodyCount: number;
 }
