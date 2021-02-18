@@ -348,8 +348,8 @@ export class EmailSenderService {
 
     await this.sendgrid.send({
       to: [
-        'jacky.maulgue@nextbio.co.za',
-        'bespoke@nextbio.co.za',
+        'cameron@hypedigital.co',
+        'bespoke@nextpath.co.za',
         'marc@ollie.health',
       ],
       from: ollieSendFromEmail,
