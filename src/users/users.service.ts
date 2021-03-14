@@ -111,6 +111,10 @@ export class UsersService {
     // set Hasura custom claims for access to graphQL based on role
     await this.firebaseAdmin.auth().setCustomUserClaims(uid, userCustomClaims);
 
+    await this.firebaseAdmin.auth().updateUser(uid, {
+      displayName: firstName + ' ' + lastName,
+    });
+
     try {
       user = await this.userRepository.save(user);
     } catch (error) {
