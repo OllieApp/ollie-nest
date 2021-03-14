@@ -44,7 +44,9 @@ export class AppointmentsController {
 
     if (!practitioner.isActive) {
       throw new BadRequestException({
-        message: ['The practitioner you are trying to book is not active.'],
+        message: [
+          'The practitioner you are trying to book is not receiving new appointments.',
+        ],
       });
     }
 
@@ -55,22 +57,19 @@ export class AppointmentsController {
       appointmentTimeSlot,
     );
 
-    await this.emailService.sendPractitionerAppointmentReceived(
-      practitioner.email,
-      {
-        appointmentStartTime: appointment.startTime,
-        isVirtual: appointment.isVirtual,
-        practitionerTitle: practitioner.title,
-        userNotes: appointment.userNotes,
-        userFirstName: user.firstName,
-        userLastName: user.lastName,
-        userAvatarUrl: user.avatarUrl,
-      },
-    );
+    this.emailService.sendPractitionerAppointmentReceived(practitioner.email, {
+      appointmentStartTime: appointment.startTime,
+      isVirtual: appointment.isVirtual,
+      practitionerTitle: practitioner.title,
+      userNotes: appointment.userNotes,
+      userFirstName: user.firstName,
+      userLastName: user.lastName,
+      userAvatarUrl: user.avatarUrl,
+    });
 
     // TODO: if we ever add logic for appointments that are not automatically confirmed,
     // do not send the user email only when the appointment is confirmed
-    await this.emailService.sendUserAppointmentConfirmed(user.email, {
+    this.emailService.sendUserAppointmentConfirmed(user.email, {
       appointmentStartTime: appointment.startTime,
       isVirtual: appointment.isVirtual,
       practitionerTitle: practitioner.title,
@@ -86,7 +85,7 @@ export class AppointmentsController {
       appointment.userVideoUrl &&
       appointment.doctorVideoUrl
     ) {
-      await this.emailService.sendPractitionerVideoAppointmentDetails(
+      this.emailService.sendPractitionerVideoAppointmentDetails(
         practitioner.email,
         {
           appointmentStartTime: appointment.startTime,
@@ -96,14 +95,14 @@ export class AppointmentsController {
           userLastName: user.lastName,
         },
       );
-      await this.emailService.sendUserVideoAppointmentDetails(user.email, {
+      this.emailService.sendUserVideoAppointmentDetails(user.email, {
         appointmentStartTime: appointment.startTime,
         practitionerTitle: practitioner.title,
         practitionerVideoUrl: appointment.userVideoUrl,
         userFirstName: user.firstName,
       });
     }
-    await this.emailService.sendInternalAppointmentCreated({
+    this.emailService.sendInternalAppointmentCreated({
       appointmentStartTime: appointment.startTime,
       appointmentIsVirtual: appointment.isVirtual,
       userEmail: user.email,
