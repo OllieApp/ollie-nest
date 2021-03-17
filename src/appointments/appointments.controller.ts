@@ -176,16 +176,13 @@ export class AppointmentsController {
       appointment.practitionerId,
     );
     if (isPractitionerCancelling) {
-      await this.emailService.sendUserAppointmentCancelledByPractitioner(
-        user.email,
-        {
-          appointmentStartTime: appointment.startTime,
-          practitionerTitle: practitioner.title,
-          userFirstName: user.firstName,
-        },
-      );
+      this.emailService.sendUserAppointmentCancelledByPractitioner(user.email, {
+        appointmentStartTime: appointment.startTime,
+        practitionerTitle: practitioner.title,
+        userFirstName: user.firstName,
+      });
       // TODO: send the email to all users who have access to this practitioner when we allow multiple users per practitioner
-      await this.emailService.sendPractitionerAppointmentCancelledConfirmation(
+      this.emailService.sendPractitionerAppointmentCancelledConfirmation(
         practitioner.email,
         {
           practitionerTitle: practitioner.title,
@@ -197,7 +194,7 @@ export class AppointmentsController {
       );
     } else {
       // TODO: send the email to all users who have access to this practitioner when we allow multiple users per practitioner
-      await this.emailService.sendPractitionerAppointmentCancelledByUser(
+      this.emailService.sendPractitionerAppointmentCancelledByUser(
         practitioner.email,
         {
           appointmentStartTime: appointment.startTime,
@@ -206,15 +203,12 @@ export class AppointmentsController {
           userLastName: user.lastName,
         },
       );
-      await this.emailService.sendUserAppointmentCancelledConfirmation(
-        user.email,
-        {
-          practitionerTitle: practitioner.title,
-          practitionerEmail: practitioner.email,
-          userFirstName: user.firstName,
-          practitionerPhone: practitioner.phone,
-        },
-      );
+      this.emailService.sendUserAppointmentCancelledConfirmation(user.email, {
+        practitionerTitle: practitioner.title,
+        practitionerEmail: practitioner.email,
+        userFirstName: user.firstName,
+        practitionerPhone: practitioner.phone,
+      });
     }
   }
 }

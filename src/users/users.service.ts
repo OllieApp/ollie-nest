@@ -39,6 +39,7 @@ export class UsersService {
     countryCode: string,
     uid: string,
     picture?: string,
+    phoneNumber?: string,
   ): Promise<User> {
     let user: User | null = null;
 
@@ -98,6 +99,7 @@ export class UsersService {
       email,
       countryCode,
       avatarUrl: picture,
+      phone: phoneNumber,
     });
 
     const userCustomClaims = {

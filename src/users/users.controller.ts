@@ -62,16 +62,17 @@ export class UsersController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async create(
     @Request() req,
-    @Body() createUserDto: CreateUserRequest,
+    @Body() createUserRequest: CreateUserRequest,
   ): Promise<UserDto> {
     const firebaseUser = req.user as FirebaseUser;
     const createdUser = await this.usersService.create(
-      createUserDto.firstName,
-      createUserDto.lastName,
+      createUserRequest.firstName,
+      createUserRequest.lastName,
       firebaseUser.email,
       COUNTRY_CODE.SouthAfrica,
       firebaseUser.uid,
       firebaseUser.picture,
+      createUserRequest.phoneNumber,
     );
 
     return new UserDto({
