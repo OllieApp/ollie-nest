@@ -19,7 +19,7 @@ import {
 import { PractitionerCategory } from './practitioner-category.entity';
 import { GENDER } from '../dto/gender.dto';
 import Appointment from 'src/appointments/entities/appointment.entity';
-import { COUNTRY_CODE } from 'src/shared/dto/country-code.dto';
+import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
 import Review from 'src/reviews/entities/review.entity';
 import PractitionerEvent from 'src/practitioner_events/entities/practitioner_event.entity';
 

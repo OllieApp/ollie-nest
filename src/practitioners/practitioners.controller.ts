@@ -27,7 +27,7 @@ import { UpdatePractitionerRequest } from './requests/update-practitioner.reques
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
-import { COUNTRY_CODE } from 'src/shared/dto/country-code.dto';
+import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
 
 @Controller('/practitioners')
 export class PractitionersController {

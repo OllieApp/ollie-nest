@@ -11,6 +11,8 @@ import {
   UsePipes,
   ValidationPipe,
   BadRequestException,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppointmentDto } from './dto/appointment.dto';
@@ -19,15 +21,41 @@ import { PractitionersService } from 'src/practitioners/services/practitioners.s
 import { UsersService } from '../users/users.service';
 import { FirebaseUser } from '@tfarras/nestjs-firebase-admin';
 import { CancelAppointmentRequest } from './requests/cancel-appointment.request';
+import {
+  GoogleSpreadsheet,
+  ServiceAccountCredentials,
+} from 'google-spreadsheet';
+import * as fs from 'fs';
+import { DateTime } from 'luxon';
 
 @Controller('/appointments')
 export class AppointmentsController {
+  private readonly logger: Logger;
+  private credentials: ServiceAccountCredentials | null | undefined;
   constructor(
     private readonly practitionersService: PractitionersService,
     private readonly usersService: UsersService,
     private readonly appointmentsService: AppointmentsService,
     private readonly emailService: EmailSenderService,
   ) {}
+
+  private loadCredentialsForServiceAccount() {
+    try {
+      const buffer = fs.readFileSync(
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PATH,
+      );
+      this.credentials = JSON.parse(buffer.toString());
+      if (!this.credentials.client_email || !this.credentials.private_key) {
+        throw new Error(
+          'The credentials for the service account were not loaded',
+        );
+      }
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: ['Something went wrong while trying to process your request.'],
+      });
+    }
+  }
 
   @Post()
   @UseGuards(AuthGuard('firebase'))
@@ -113,6 +141,13 @@ export class AppointmentsController {
       practitionerEmail: practitioner.email,
       practitionerPhone: practitioner.phone,
     });
+
+    this.addAppointmentToGoogleSheet(
+      practitioner.title,
+      user.firstName,
+      user.lastName,
+      { ...appointment, status: appointment.statusId },
+    );
 
     return new AppointmentDto({
       id: appointment.id,
@@ -209,6 +244,61 @@ export class AppointmentsController {
         userFirstName: user.firstName,
         practitionerPhone: practitioner.phone,
       });
+    }
+  }
+
+  private async addAppointmentToGoogleSheet(
+    practitionerTitle: string,
+    patientFirstName: string,
+    patientLastName: string,
+    appointment: AppointmentDto,
+  ) {
+    // insert the data into the Google sheet
+    if (!this.credentials) {
+      this.loadCredentialsForServiceAccount();
+    }
+    const doc = new GoogleSpreadsheet(
+      process.env.GOOGLE_SPREADSHEET_NEW_APPOINTMENTS_ID,
+    );
+
+    try {
+      await doc.useServiceAccountAuth(this.credentials);
+      await doc.loadInfo();
+    } catch (error) {
+      this.logger.error(
+        `Error while trying to access the file with the provided credentials ${error}`,
+      );
+      return;
+    }
+
+    const formattedStartTime = DateTime.fromJSDate(appointment.startTime)
+      .setZone('Africa/Johannesburg')
+      .toFormat('dd.MM.yyyy t');
+    const formattedEndTime = DateTime.fromJSDate(appointment.endTime)
+      .setZone('Africa/Johannesburg')
+      .toFormat('dd.MM.yyyy t');
+
+    const formattedCreatedDate = DateTime.fromJSDate(appointment.createdAt)
+      .setZone('Africa/Johannesburg')
+      .toFormat('dd.MM.yyyy t');
+
+    try {
+      const sheet = doc.sheetsByIndex[0];
+      await sheet.addRow([
+        appointment.id,
+        practitionerTitle,
+        patientFirstName,
+        patientLastName,
+        appointment.isVirtual ? 'Virtual' : 'Physical',
+        formattedStartTime,
+        formattedEndTime,
+        appointment.userNotes,
+        formattedCreatedDate,
+      ]);
+    } catch (error) {
+      this.logger.error(
+        `Error while trying to insert the appointment data into the spreadsheet ${error}`,
+      );
     }
   }
 }
