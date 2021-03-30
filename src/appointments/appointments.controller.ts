@@ -147,6 +147,7 @@ export class AppointmentsController {
       user.firstName,
       user.lastName,
       user.email,
+      user.phone,
       { ...appointment, status: appointment.statusId },
     );
 
@@ -253,6 +254,7 @@ export class AppointmentsController {
     patientFirstName: string,
     patientLastName: string,
     patientEmail: string,
+    patientPhoneNumber: string,
     appointment: AppointmentDto,
   ) {
     // insert the data into the Google sheet
@@ -292,6 +294,7 @@ export class AppointmentsController {
         patientFirstName,
         patientLastName,
         patientEmail,
+        patientPhoneNumber,
         appointment.isVirtual ? 'Virtual' : 'Physical',
         formattedStartTime,
         formattedEndTime,
