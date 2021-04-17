@@ -44,9 +44,6 @@ class Practitioner {
   public bio?: string;
 
   @Column({ type: 'text', nullable: true })
-  public description?: string;
-
-  @Column({ type: 'text', nullable: true })
   public address?: string;
 
   @Column({
