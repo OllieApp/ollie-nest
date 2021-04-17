@@ -8,6 +8,8 @@ import PractitionerSchedule from './entities/practitioner-schedule.entity';
 import Practitioner from './entities/practitioner.entity';
 import { PractitionersService } from './services/practitioners.service';
 import { PractitionerSchedulesService } from './services/practitioner-schedules.service';
+import { PractitionerQualificationsService } from './services/practitioner-qualifications.service';
+import PractitionerQualification from './entities/practitioner-qualification.entity';
 
 @Module({
   imports: [
@@ -17,10 +19,15 @@ import { PractitionerSchedulesService } from './services/practitioner-schedules.
       PractitionerCategory,
       PractitionerSchedule,
       Language,
+      PractitionerQualification,
     ]),
   ],
   controllers: [PractitionersController],
-  providers: [PractitionersService, PractitionerSchedulesService],
+  providers: [
+    PractitionersService,
+    PractitionerSchedulesService,
+    PractitionerQualificationsService,
+  ],
   exports: [PractitionersService, PractitionerSchedulesService],
 })
 export class PractitionersModule {}

@@ -36,11 +36,6 @@ export class UpdatePractitionerRequest {
 
   @IsOptional()
   @IsNotEmpty()
-  @MaxLength(1500)
-  description?: string;
-
-  @IsOptional()
-  @IsNotEmpty()
   address?: string;
 
   @IsOptional()
