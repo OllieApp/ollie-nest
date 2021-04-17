@@ -229,6 +229,6 @@ class Practitioner {
     qualification => qualification.practitioner,
     { eager: false },
   )
-  public qualifications: Promise<PractitionerQualification>[];
+  public qualifications: Promise<PractitionerQualification[]>;
 }
 export default Practitioner;
