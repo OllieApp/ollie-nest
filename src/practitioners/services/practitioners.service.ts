@@ -243,6 +243,8 @@ export class PractitionersService {
         languages: request.languages
           ? request.languages.map(l => ({ id: l }))
           : null,
+        // we don't update qualifications here
+        qualifications: undefined,
       };
 
       removeEmpty(updatedPractitioner);
