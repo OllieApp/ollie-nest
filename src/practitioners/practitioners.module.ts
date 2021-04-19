@@ -10,11 +10,13 @@ import { PractitionersService } from './services/practitioners.service';
 import { PractitionerSchedulesService } from './services/practitioner-schedules.service';
 import { PractitionerQualificationsService } from './services/practitioner-qualifications.service';
 import PractitionerQualification from './entities/practitioner-qualification.entity';
+import Address from 'src/shared/entities/address.entity';
 
 @Module({
   imports: [
     UsersModule,
     TypeOrmModule.forFeature([
+      Address,
       Practitioner,
       PractitionerCategory,
       PractitionerSchedule,
