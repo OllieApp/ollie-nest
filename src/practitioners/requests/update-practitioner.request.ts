@@ -1,6 +1,5 @@
-import { Location } from '../dto/location.dto';
+import { AddressDto } from 'src/shared/dtos/address.dto';
 import { MEDICAL_AID } from 'src/medical_aids/models/medical_aid.model';
-import { PRACTITIONER_CATEGORY } from '../dto/category.dto';
 import { LANGUAGE } from '../dto/language.dto';
 import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 import {
@@ -35,8 +34,8 @@ export class UpdatePractitionerRequest {
   bio?: string;
 
   @IsOptional()
-  @IsNotEmpty()
-  address?: string;
+  @IsObject()
+  address?: AddressDto;
 
   @IsOptional()
   @IsNotEmpty()
@@ -50,13 +49,6 @@ export class UpdatePractitionerRequest {
   @IsNotEmpty()
   @IsArray()
   medicalAids?: MEDICAL_AID[];
-
-  @IsOptional()
-  category?: PRACTITIONER_CATEGORY;
-
-  @IsOptional()
-  @IsObject()
-  location?: Location;
 
   @IsOptional()
   @IsBoolean()
