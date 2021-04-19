@@ -1,5 +1,4 @@
 import { LANGUAGE } from '../dto/language.dto';
-import { PRACTITIONER_CATEGORY } from '../dto/category.dto';
 import { MEDICAL_AID } from './../../medical_aids/models/medical_aid.model';
 import { UpdatePractitionerRequest } from '../requests/update-practitioner.request';
 import { CreatePractitionerRequest } from '../requests/create-practitioner.request';
@@ -21,12 +20,15 @@ import {
 } from '@tfarras/nestjs-firebase-admin';
 import * as crypto from 'crypto';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import Address from 'src/shared/entities/address.entity';
+import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
 
 @Injectable()
 export class PractitionersService {
   constructor(
     @InjectRepository(Practitioner)
     private readonly practitionerRepository: Repository<Practitioner>,
+    private readonly addressRepository: Repository<Address>,
     @Inject(FIREBASE_ADMIN_INJECT) private firebaseAdmin: FirebaseAdminSDK,
   ) {}
 
@@ -67,6 +69,26 @@ export class PractitionersService {
     await this.firebaseAdmin
       .auth()
       .setCustomUserClaims(userUid, userCustomClaims);
+    let address: null | Address = null;
+
+    try {
+      address = this.addressRepository.create({
+        line1: '',
+        line2: '',
+        suburb: '',
+        city: '',
+        postalCode: '',
+        countryCode: COUNTRY_CODE.SouthAfrica,
+        location: null,
+        stateProvinceCounty: '',
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: [
+          'Something went wrong while trying to create the practitioner',
+        ],
+      });
+    }
 
     try {
       const newPractitioner = this.practitionerRepository.create({
@@ -78,6 +100,7 @@ export class PractitionersService {
           id: category,
         },
         languages: [{ id: LANGUAGE.English }],
+        addressId: address?.id,
       });
 
       return await this.practitionerRepository.save(newPractitioner);
@@ -150,27 +173,34 @@ export class PractitionersService {
     practitionerId: string,
     request: UpdatePractitionerRequest,
   ) {
-    if (request.title && request.title.trim().length == 0) {
+    const {
+      address,
+      consultationPricingFrom,
+      consultationPricingTo,
+      email,
+      languages,
+      medicalAids,
+      title,
+    } = request;
+
+    if (title && title.trim().length == 0) {
       throw new BadRequestException({
         message: ['The title of the practitioner cannot be empty.'],
       });
     }
-    if (request.email && !emailValidationPattern.test(request.email)) {
+    if (email && !emailValidationPattern.test(email)) {
       throw new BadRequestException({
         message: ['The email of the practitioner is invalid.'],
       });
     }
-    if (
-      request.consultationPricingFrom &&
-      request.consultationPricingFrom < 0
-    ) {
+    if (consultationPricingFrom && consultationPricingFrom < 0) {
       throw new BadRequestException({
         message: [
           'The starting price of a consultation has to be a positive decimal number.',
         ],
       });
     }
-    if (request.consultationPricingTo && request.consultationPricingTo < 0) {
+    if (consultationPricingTo && consultationPricingTo < 0) {
       throw new BadRequestException({
         message: [
           'The highest price of a consultation has to be a positive decimal number.',
@@ -178,10 +208,7 @@ export class PractitionersService {
       });
     }
 
-    if (
-      request.medicalAids &&
-      request.medicalAids.some(m => !(m in MEDICAL_AID))
-    ) {
+    if (medicalAids && medicalAids.some(m => !(m in MEDICAL_AID))) {
       throw new BadRequestException({
         message: [
           'One of the medical aids could not be find in the available medical aids.',
@@ -189,27 +216,20 @@ export class PractitionersService {
       });
     }
 
-    if (request.category && !(request.category in PRACTITIONER_CATEGORY)) {
-      throw new BadRequestException({
-        message: [
-          'The category could not be found in the available practitioner categories.',
-        ],
-      });
-    }
-
     if (
-      request.location &&
-      (request.location.latitude > 90 ||
-        request.location.latitude < -90 ||
-        request.location.longitude > 180 ||
-        request.location.longitude < -180)
+      address &&
+      address.location &&
+      (address.location.latitude > 90 ||
+        address.location.latitude < -90 ||
+        address.location.longitude > 180 ||
+        address.location.longitude < -180)
     ) {
       throw new BadRequestException({
         message: ["The location is not within Earth's location bounds."],
       });
     }
 
-    if (request.languages && request.languages.some(l => !(l in LANGUAGE))) {
+    if (languages && languages.some(l => !(l in LANGUAGE))) {
       throw new BadRequestException({
         message: [
           'One of the languages is not part of our available languages.',
@@ -221,35 +241,47 @@ export class PractitionersService {
       const removeEmpty = (obj: any) => {
         Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
       };
-      const updatedPractitioner: QueryDeepPartialEntity<Practitioner> = {
+      const updatedDataPractitioner: QueryDeepPartialEntity<Practitioner> = {
         ...request,
-        medicalAids: request.medicalAids
-          ? request.medicalAids.map(m => ({ id: m }))
-          : null,
-        category: request.category
-          ? {
-              id: request.category,
-            }
-          : null,
-        location: request.location
-          ? {
-              type: 'Point',
-              coordinates: [
-                request.location.latitude,
-                request.location.longitude,
-              ],
-            }
-          : null,
-        languages: request.languages
-          ? request.languages.map(l => ({ id: l }))
-          : null,
-        // we don't update qualifications here
+        medicalAids: medicalAids ? medicalAids.map(m => ({ id: m })) : null,
+        languages: languages ? languages.map(l => ({ id: l })) : null,
+        // we don't update these properties here
         qualifications: undefined,
+        address: undefined,
+        location: undefined,
       };
 
-      removeEmpty(updatedPractitioner);
+      removeEmpty(updatedDataPractitioner);
 
-      this.practitionerRepository.update(practitionerId, updatedPractitioner);
+      await this.practitionerRepository.update(
+        practitionerId,
+        updatedDataPractitioner,
+      );
+
+      if (address) {
+        const addressId = await this.getAddressIdForPractitionerId(
+          practitionerId,
+        );
+        this.addressRepository.update(addressId, {
+          city: address.city ?? undefined,
+          line1: address.line1 ?? undefined,
+          line2: address.line2 ?? undefined,
+          // we don't allow a different country atm
+          //countryCode: Object.values(COUNTRY_CODE).find(e => e == updatedAddress.countryCode),
+          postalCode: address.postalCode ?? undefined,
+          stateProvinceCounty: address.stateProvinceCounty ?? undefined,
+          suburb: address.suburb ?? undefined,
+          location: address.location
+            ? {
+                type: 'Point',
+                coordinates: [
+                  address.location.latitude,
+                  address.location.longitude,
+                ],
+              }
+            : undefined,
+        });
+      }
     } catch (error) {
       throw new InternalServerErrorException({
         message: [
@@ -342,5 +374,27 @@ export class PractitionersService {
         avatarUrl: null,
       },
     );
+  }
+
+  private async getAddressIdForPractitionerId(
+    practitionerId: string,
+  ): Promise<string> {
+    try {
+      const rawResult: {
+        address_id: string;
+      } = await this.practitionerRepository
+        .createQueryBuilder('practitioner')
+        .select(['practitioner.address_id'])
+        .where('practitioner.id = :practitionerId', {
+          practitionerId: practitionerId,
+        })
+        .getRawOne();
+      if (rawResult) {
+        return rawResult.address_id;
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
   }
 }
