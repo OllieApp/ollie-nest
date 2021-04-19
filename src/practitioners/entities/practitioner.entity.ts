@@ -14,6 +14,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PractitionerCategory } from './practitioner-category.entity';
@@ -23,6 +24,7 @@ import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
 import Review from 'src/reviews/entities/review.entity';
 import PractitionerEvent from 'src/practitioner_events/entities/practitioner_event.entity';
 import PractitionerQualification from './practitioner-qualification.entity';
+import Address from 'src/shared/entities/address.entity';
 
 @Entity('practitioner')
 @Check(`"consultation_pricing_from" < "consultation_pricing_to"`)
@@ -43,8 +45,22 @@ class Practitioner {
   @Column({ type: 'text', nullable: true })
   public bio?: string;
 
+  //TODO: to be removed at a later stage
   @Column({ type: 'text', nullable: true })
   public address?: string;
+
+  // needed to specify the career path
+  @Column({ type: 'text', name: 'career_path', nullable: false, default: '' })
+  public careerPath: string;
+
+  //TODO: to be renamed at a later stage - only the name of the variable
+  // remove nullable after migration
+  @OneToOne(() => Address, { eager: true, nullable: true })
+  @JoinColumn({ name: 'address_id' })
+  public addressObject?: Address;
+
+  @Column({ name: 'address_id', nullable: true })
+  public addressId?: string;
 
   @Column({
     name: 'appointment_time_slot',
@@ -122,6 +138,7 @@ class Practitioner {
   })
   public createdAt: Date;
 
+  //TODO: to be removed at a later stage
   @Column({
     type: 'geography',
     srid: 4326,
@@ -148,6 +165,15 @@ class Practitioner {
   })
   @Index()
   public isVerified: boolean;
+
+  @Column({
+    type: 'boolean',
+    name: 'is_disabled',
+    nullable: false,
+    default: false,
+  })
+  @Index()
+  public isDisabled: boolean;
 
   @Column({ type: 'real', default: 0, nullable: false, unsigned: true })
   public rating: number;
