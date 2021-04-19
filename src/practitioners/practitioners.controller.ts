@@ -90,14 +90,16 @@ export class PractitionersController {
         })),
         category: practitioner.category.id,
         medicalAids: practitioner.medicalAids?.map(m => m.id),
-        location:
-          practitioner.location && practitioner.location.bbox
+        languages: practitioner.languages.map(l => l.id),
+        address: {
+          ...practitioner.addressObject,
+          location: practitioner.addressObject.location
             ? {
-                latitude: practitioner.location.bbox[0],
-                longitude: practitioner.location.bbox[1],
+                latitude: practitioner.addressObject.location.bbox[0],
+                longitude: practitioner.addressObject.location.bbox[1],
               }
             : null,
-        languages: practitioner.languages.map(l => l.id),
+        },
       });
     }
 
@@ -115,13 +117,21 @@ export class PractitionersController {
       ...practitioner,
       medicalAids: [],
       category: practitioner.category.id,
-      location: null,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
         startTime: s.startTime,
         endTime: s.endTime,
       })),
       languages: [],
+      address: {
+        ...practitioner.addressObject,
+        location: practitioner.addressObject.location
+          ? {
+              latitude: practitioner.addressObject.location.bbox[0],
+              longitude: practitioner.addressObject.location.bbox[1],
+            }
+          : null,
+      },
     });
   }
 
@@ -154,13 +164,16 @@ export class PractitionersController {
       })),
       category: practitioner.category.id,
       medicalAids: practitioner.medicalAids.map(m => m.id),
-      location: practitioner.location?.bbox
-        ? {
-            latitude: practitioner.location?.bbox[0],
-            longitude: practitioner.location?.bbox[1],
-          }
-        : null,
       languages: practitioner.languages.map(l => l.id),
+      address: {
+        ...practitioner.addressObject,
+        location: practitioner.addressObject.location
+          ? {
+              latitude: practitioner.addressObject.location.bbox[0],
+              longitude: practitioner.addressObject.location.bbox[1],
+            }
+          : null,
+      },
     });
   }
 
