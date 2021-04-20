@@ -104,12 +104,16 @@ export class AppointmentsController {
       line2,
       postalCode,
       stateProvinceCounty,
+      suburb,
     } = practitioner.addressObject;
 
-    const address = `${line2.length > 0 ? line2 + ' ' : ''}${line1}, ${city}${
-      postalCode.length > 0 ? ' ' + postalCode : ''
-    }, 
-    ${stateProvinceCounty.length > 0 ? ' ' + stateProvinceCounty + ',' : ''}`;
+    const line2String = line2.length > 0 ? line2 + ' ' : '';
+    const postalCodeString = postalCode.length > 0 ? ' ' + postalCode : '';
+    const stateProvinceCountyString =
+      stateProvinceCounty.length > 0 ? ', ' + stateProvinceCounty : '';
+    const suburbString = suburb.length > 0 ? suburb + ',' : '';
+
+    const address = `${line2String}${line1}, ${suburbString}${city}${postalCodeString}${stateProvinceCountyString}`;
 
     this.emailService.sendUserAppointmentConfirmed(user.email, {
       appointmentStartTime: appointment.startTime,
