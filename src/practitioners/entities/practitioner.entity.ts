@@ -36,8 +36,8 @@ class Practitioner {
   @Column({ type: 'text' })
   public title: string;
 
-  @Column({ type: 'text', nullable: true })
-  public email?: string;
+  @Column({ type: 'text' })
+  public email: string;
 
   @Column({ type: 'text', nullable: true })
   public phone?: string;

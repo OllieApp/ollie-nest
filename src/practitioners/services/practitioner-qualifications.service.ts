@@ -55,11 +55,11 @@ export class PractitionerQualificationsService {
           );
         }
         return {
-          fromDate,
+          fromDate: fromDate.toJSDate(),
           isCurrent: q.isCurrent,
           practitionerId: practitionerId,
           title: q.title,
-          toDate: q.isCurrent ? null : toDate,
+          toDate: q.isCurrent ? null : toDate.toJSDate(),
         };
       });
       await this.qualificationsRepository

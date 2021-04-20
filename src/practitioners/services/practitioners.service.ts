@@ -28,6 +28,7 @@ export class PractitionersService {
   constructor(
     @InjectRepository(Practitioner)
     private readonly practitionerRepository: Repository<Practitioner>,
+    @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
     @Inject(FIREBASE_ADMIN_INJECT) private firebaseAdmin: FirebaseAdminSDK,
   ) {}
@@ -82,6 +83,7 @@ export class PractitionersService {
         location: null,
         stateProvinceCounty: '',
       });
+      await this.addressRepository.save(address);
     } catch (error) {
       throw new InternalServerErrorException({
         message: [
@@ -103,7 +105,10 @@ export class PractitionersService {
         addressId: address?.id,
       });
 
-      return await this.practitionerRepository.save(newPractitioner);
+      return {
+        ...(await this.practitionerRepository.save(newPractitioner)),
+        addressObject: address,
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         message: [
@@ -181,6 +186,9 @@ export class PractitionersService {
       languages,
       medicalAids,
       title,
+      bio,
+      isActive,
+      phone,
     } = request;
 
     if (title && title.trim().length == 0) {
@@ -188,7 +196,7 @@ export class PractitionersService {
         message: ['The title of the practitioner cannot be empty.'],
       });
     }
-    if (email && !emailValidationPattern.test(email)) {
+    if (email && !emailValidationPattern.test(email.trim())) {
       throw new BadRequestException({
         message: ['The email of the practitioner is invalid.'],
       });
@@ -237,50 +245,74 @@ export class PractitionersService {
       });
     }
 
-    try {
-      const removeEmpty = (obj: any) => {
-        Object.keys(obj).forEach(key => obj[key] == null && delete obj[key]);
-      };
-      const updatedDataPractitioner: QueryDeepPartialEntity<Practitioner> = {
-        ...request,
-        medicalAids: medicalAids ? medicalAids.map(m => ({ id: m })) : null,
-        languages: languages ? languages.map(l => ({ id: l })) : null,
-        // we don't update these properties here
-        qualifications: undefined,
-        address: undefined,
-        location: undefined,
-      };
+    // we need to remove undefined for the update method because of
+    // https://github.com/typeorm/typeorm/issues/2331
+    // undefined in TS typeorm represents NULL in PostgreSQL for typeorm update method
+    // (not for the save method though, where undefined is undefined and null is NULL in the db)
 
-      removeEmpty(updatedDataPractitioner);
-
-      await this.practitionerRepository.update(
-        practitionerId,
-        updatedDataPractitioner,
+    const removeUndefined = (obj: any) => {
+      Object.keys(obj).forEach(
+        key => obj[key] === undefined && delete obj[key],
       );
+    };
+
+    const anyValuesToUpdate = (obj: any) =>
+      Object.keys(obj).some(key => obj[key] !== undefined);
+
+    try {
+      const updatedDataPractitioner: QueryDeepPartialEntity<Practitioner> = {
+        medicalAids: medicalAids?.map(m => ({ id: m })) ?? undefined,
+        languages: languages?.map(l => ({ id: l })) ?? undefined,
+        consultationPricingFrom: consultationPricingFrom ?? undefined,
+        consultationPricingTo: consultationPricingTo ?? undefined,
+        title: title?.trim() ?? undefined,
+        email: email?.trim() ?? undefined,
+        phone: phone?.trim() ?? undefined,
+        isActive: isActive ?? undefined,
+        bio: bio?.trim() ?? undefined,
+      };
+
+      removeUndefined(updatedDataPractitioner);
+
+      if (anyValuesToUpdate(updatedDataPractitioner)) {
+        await this.practitionerRepository.update(
+          practitionerId,
+          updatedDataPractitioner,
+        );
+      }
 
       if (address) {
         const addressId = await this.getAddressIdForPractitionerId(
           practitionerId,
         );
-        this.addressRepository.update(addressId, {
-          city: address.city ?? undefined,
-          line1: address.line1 ?? undefined,
-          line2: address.line2 ?? undefined,
+        const updatedAddressData: QueryDeepPartialEntity<Address> = {
+          city: address.city?.trim() ?? undefined,
+          line1: address.line1?.trim() ?? undefined,
+          line2: address.line2?.trim() ?? undefined,
           // we don't allow a different country atm
           //countryCode: Object.values(COUNTRY_CODE).find(e => e == updatedAddress.countryCode),
-          postalCode: address.postalCode ?? undefined,
-          stateProvinceCounty: address.stateProvinceCounty ?? undefined,
-          suburb: address.suburb ?? undefined,
-          location: address.location
-            ? {
-                type: 'Point',
-                coordinates: [
-                  address.location.latitude,
-                  address.location.longitude,
-                ],
-              }
-            : undefined,
-        });
+          postalCode: address.postalCode?.trim() ?? undefined,
+          stateProvinceCounty: address.stateProvinceCounty?.trim() ?? undefined,
+          suburb: address.suburb?.trim() ?? undefined,
+          location:
+            address.location !== undefined
+              ? address.location !== null
+                ? {
+                    type: 'Point',
+                    coordinates: [
+                      address.location.latitude,
+                      address.location.longitude,
+                    ],
+                  }
+                : null
+              : undefined,
+        };
+
+        removeUndefined(updatedAddressData);
+
+        if (anyValuesToUpdate(updatedAddressData)) {
+          await this.addressRepository.update(addressId, updatedAddressData);
+        }
       }
     } catch (error) {
       throw new InternalServerErrorException({

@@ -26,10 +26,14 @@ class PractitionerQualification {
   @Column({ type: 'text', nullable: false })
   public title: string;
 
-  @Column({ type: 'date', nullable: false, name: 'from_date' })
+  @Column({
+    type: 'timestamp with time zone',
+    nullable: false,
+    name: 'from_date',
+  })
   public fromDate: Date;
 
-  @Column({ type: 'date', nullable: true, name: 'to_date' })
+  @Column({ type: 'timestamp with time zone', nullable: true, name: 'to_date' })
   public toDate?: Date;
 
   @Column({

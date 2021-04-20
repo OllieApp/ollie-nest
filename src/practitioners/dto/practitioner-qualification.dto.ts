@@ -21,8 +21,4 @@ export class PractitionerQualificationDto {
 
   @IsBoolean()
   public isCurrent: boolean;
-
-  @IsNotEmpty()
-  @IsString()
-  public practitionerId: string;
 }

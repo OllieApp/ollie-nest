@@ -81,7 +81,7 @@ export class PractitionersController {
         practitionerIds[0],
         userId,
       );
-      return new PractitionerDto({
+      return {
         ...practitioner,
         schedules: practitioner.schedules?.map(s => ({
           daysOfWeek: [s.dayOfWeek],
@@ -100,7 +100,7 @@ export class PractitionersController {
               }
             : null,
         },
-      });
+      };
     }
 
     const practitioner = await this.practitionersService.createPractitioner(
@@ -113,7 +113,7 @@ export class PractitionersController {
       practitioner.id,
     );
 
-    return new PractitionerDto({
+    return {
       ...practitioner,
       medicalAids: [],
       category: practitioner.category.id,
@@ -132,7 +132,7 @@ export class PractitionersController {
             }
           : null,
       },
-    });
+    };
   }
 
   @Get(':id')
@@ -155,7 +155,7 @@ export class PractitionersController {
       });
     }
 
-    return new PractitionerDto({
+    return {
       ...practitioner,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
@@ -174,7 +174,7 @@ export class PractitionersController {
             }
           : null,
       },
-    });
+    };
   }
 
   @Get()
@@ -334,7 +334,6 @@ export class PractitionersController {
       qualifications: qualifications.map(q => ({
         fromDate: q.fromDate.toISOString(),
         isCurrent: q.isCurrent,
-        practitionerId: q.practitionerId,
         title: q.title,
         toDate: q.toDate?.toISOString(),
       })),
