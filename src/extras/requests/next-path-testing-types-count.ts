@@ -6,7 +6,4 @@ export class NextPathologyTestingTypesCount {
 
   @IsNumber()
   public antigenCount: number;
-
-  @IsNumber()
-  public antibodyCount: number;
 }

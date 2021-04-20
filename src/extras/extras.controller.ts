@@ -43,7 +43,6 @@ export class ExtrasController {
       email,
       fullAddress,
       fullName,
-      id,
       numberOfPeople,
       phone,
       testingTypesCount,
