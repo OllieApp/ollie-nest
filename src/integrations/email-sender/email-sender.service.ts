@@ -302,7 +302,7 @@ export class EmailSenderService {
     };
 
     await this.sendgrid.send({
-      to: ['marc@ollie.health', 'cameron@ollie.health'],
+      to: ['marc@ollie.health', 'cameron@ollie.health', 'maelyn@ollie.health'],
       from: ollieSendFromEmail,
       templateId: TemplateIds.internalAppointmentCreated,
       dynamicTemplateData: templateData,

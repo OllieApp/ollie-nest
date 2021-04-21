@@ -97,13 +97,31 @@ export class AppointmentsController {
 
     // TODO: if we ever add logic for appointments that are not automatically confirmed,
     // do not send the user email only when the appointment is confirmed
+
+    const {
+      city,
+      line1,
+      line2,
+      postalCode,
+      stateProvinceCounty,
+      suburb,
+    } = practitioner.addressObject;
+
+    const line2String = line2.length > 0 ? line2 + ' ' : '';
+    const postalCodeString = postalCode.length > 0 ? ' ' + postalCode : '';
+    const stateProvinceCountyString =
+      stateProvinceCounty.length > 0 ? ', ' + stateProvinceCounty : '';
+    const suburbString = suburb.length > 0 ? suburb + ',' : '';
+
+    const address = `${line2String}${line1}, ${suburbString}${city}${postalCodeString}${stateProvinceCountyString}`;
+
     this.emailService.sendUserAppointmentConfirmed(user.email, {
       appointmentStartTime: appointment.startTime,
       isVirtual: appointment.isVirtual,
       practitionerTitle: practitioner.title,
       userNotes: appointment.userNotes,
       userFirstName: user.firstName,
-      practitionerAddress: practitioner.address,
+      practitionerAddress: address,
       practitionerAvatarUrl: practitioner.avatarUrl,
       practitionerCategory: practitioner.category.id,
     });

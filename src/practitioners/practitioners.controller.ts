@@ -1,4 +1,7 @@
-import { PractitionerIdsForUser } from './dto/practitioner-for-user.dto';
+import { PractitionerQualificationsResponse } from './responses/practitioner-qualifications.response';
+import { UpdateQualificationsRequest } from './requests/update-qualifications.request';
+import { PractitionerQualificationsService } from './services/practitioner-qualifications.service';
+import { PractitionerIdsForUserResponse } from './responses/practitioner-ids-for-user.response';
 import { CreatePractitionerRequest } from './requests/create-practitioner.request';
 import { UsersService } from './../users/users.service';
 import {
@@ -35,6 +38,7 @@ export class PractitionersController {
     private readonly practitionersService: PractitionersService,
     private readonly schedulesService: PractitionerSchedulesService,
     private readonly usersService: UsersService,
+    private readonly qualificationsService: PractitionerQualificationsService,
   ) {}
 
   @Post()
@@ -77,7 +81,7 @@ export class PractitionersController {
         practitionerIds[0],
         userId,
       );
-      return new PractitionerDto({
+      return {
         ...practitioner,
         schedules: practitioner.schedules?.map(s => ({
           daysOfWeek: [s.dayOfWeek],
@@ -86,15 +90,17 @@ export class PractitionersController {
         })),
         category: practitioner.category.id,
         medicalAids: practitioner.medicalAids?.map(m => m.id),
-        location:
-          practitioner.location && practitioner.location.bbox
+        languages: practitioner.languages.map(l => l.id),
+        address: {
+          ...practitioner.addressObject,
+          location: practitioner.addressObject.location
             ? {
-                latitude: practitioner.location.bbox[0],
-                longitude: practitioner.location.bbox[1],
+                latitude: practitioner.addressObject.location.bbox[0],
+                longitude: practitioner.addressObject.location.bbox[1],
               }
             : null,
-        languages: practitioner.languages.map(l => l.id),
-      });
+        },
+      };
     }
 
     const practitioner = await this.practitionersService.createPractitioner(
@@ -107,18 +113,26 @@ export class PractitionersController {
       practitioner.id,
     );
 
-    return new PractitionerDto({
+    return {
       ...practitioner,
       medicalAids: [],
       category: practitioner.category.id,
-      location: null,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
         startTime: s.startTime,
         endTime: s.endTime,
       })),
       languages: [],
-    });
+      address: {
+        ...practitioner.addressObject,
+        location: practitioner.addressObject.location
+          ? {
+              latitude: practitioner.addressObject.location.bbox[0],
+              longitude: practitioner.addressObject.location.bbox[1],
+            }
+          : null,
+      },
+    };
   }
 
   @Get(':id')
@@ -141,7 +155,7 @@ export class PractitionersController {
       });
     }
 
-    return new PractitionerDto({
+    return {
       ...practitioner,
       schedules: practitioner.schedules.map(s => ({
         daysOfWeek: [s.dayOfWeek],
@@ -150,26 +164,28 @@ export class PractitionersController {
       })),
       category: practitioner.category.id,
       medicalAids: practitioner.medicalAids.map(m => m.id),
-      location: practitioner.location?.bbox
-        ? {
-            latitude: practitioner.location?.bbox[0],
-            longitude: practitioner.location?.bbox[1],
-          }
-        : null,
       languages: practitioner.languages.map(l => l.id),
-    });
+      address: {
+        ...practitioner.addressObject,
+        location: practitioner.addressObject.location
+          ? {
+              latitude: practitioner.addressObject.location.bbox[0],
+              longitude: practitioner.addressObject.location.bbox[1],
+            }
+          : null,
+      },
+    };
   }
 
   @Get()
   @UseGuards(AuthGuard('firebase'))
   async getPractitionerIds(
     @Request() req,
-    @Param('id') id: string,
-  ): Promise<PractitionerIdsForUser> {
+  ): Promise<PractitionerIdsForUserResponse> {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
 
-    return new PractitionerIdsForUser(
+    return new PractitionerIdsForUserResponse(
       await this.practitionersService.getPractitionersIdsForUserId(userId),
     );
   }
@@ -180,7 +196,7 @@ export class PractitionersController {
   async update(
     @Request() req,
     @Param('id') practitionerId: string,
-    @Body() updatePractitionerDto: UpdatePractitionerRequest,
+    @Body() updatePractitionerReq: UpdatePractitionerRequest,
   ) {
     const firebaseUser = req.user as FirebaseUser;
     const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
@@ -196,14 +212,14 @@ export class PractitionersController {
 
     await this.practitionersService.updatePractitioner(
       practitionerId,
-      updatePractitionerDto,
+      updatePractitionerReq,
     );
     if (
-      updatePractitionerDto.schedules &&
-      updatePractitionerDto.schedules.length != 0
+      updatePractitionerReq.schedules &&
+      updatePractitionerReq.schedules.length != 0
     ) {
       await this.schedulesService.replaceCurrentSchedules(
-        updatePractitionerDto.schedules,
+        updatePractitionerReq.schedules,
         practitionerId,
       );
     }
@@ -218,7 +234,7 @@ export class PractitionersController {
     }),
   )
   @UseGuards(AuthGuard('firebase'))
-  async uploadFile(
+  async uploadAvatar(
     @Request() req,
     @UploadedFile() file,
     @Param('id') practitionerId: string,
@@ -249,5 +265,78 @@ export class PractitionersController {
       practitionerId,
       file.mimetype,
     );
+  }
+
+  @Get('/:id/qualifications')
+  @UseGuards(AuthGuard('firebase'))
+  async getPractitionerQualifications(
+    @Request() req,
+    @Param('id') practitionerId: string,
+  ): Promise<PractitionerQualificationsResponse> {
+    const firebaseUser = req.user as FirebaseUser;
+    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+
+    const practitioner = await this.practitionersService.getPractitionerByUserId(
+      practitionerId,
+      userId,
+    );
+
+    if (!practitioner) {
+      throw new NotFoundException({
+        message: ['The requested practitioner was not found.'],
+      });
+    }
+
+    const qualifications = await this.qualificationsService.getQualificationsForPractitionerId(
+      practitioner.id,
+    );
+
+    return {
+      qualifications: qualifications.map(q => ({
+        fromDate: q.fromDate.toISOString(),
+        isCurrent: q.isCurrent,
+        practitionerId: q.practitionerId,
+        title: q.title,
+        toDate: q.toDate?.toISOString(),
+      })),
+    };
+  }
+
+  @Post('/:id/qualifications')
+  @UseGuards(AuthGuard('firebase'))
+  async updatePractitionerQualifications(
+    @Request() req,
+    @Param('id') practitionerId: string,
+    @Body() updateQualificationsReq: UpdateQualificationsRequest,
+  ): Promise<PractitionerQualificationsResponse> {
+    const firebaseUser = req.user as FirebaseUser;
+    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+
+    const practitioner = await this.practitionersService.getPractitionerByUserId(
+      practitionerId,
+      userId,
+    );
+
+    if (!practitioner) {
+      throw new NotFoundException({
+        message: ['The requested practitioner was not found.'],
+      });
+    }
+
+    await this.qualificationsService.updateQualificationsByPractitionerId(
+      practitioner.id,
+      updateQualificationsReq.qualifications,
+    );
+
+    const qualifications = await practitioner.qualifications;
+
+    return {
+      qualifications: qualifications.map(q => ({
+        fromDate: q.fromDate.toISOString(),
+        isCurrent: q.isCurrent,
+        title: q.title,
+        toDate: q.toDate?.toISOString(),
+      })),
+    };
   }
 }

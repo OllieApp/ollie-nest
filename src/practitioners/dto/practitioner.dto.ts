@@ -3,29 +3,47 @@ import { PractitionerScheduleDto } from './practitioner-schedule.dto';
 import { MEDICAL_AID } from '../../medical_aids/models/medical_aid.model';
 import { PRACTITIONER_CATEGORY } from './category.dto';
 import { GENDER } from './gender.dto';
-import { Location } from './location.dto';
-export class PractitionerDto {
-  id: string;
-  title: string;
-  email?: string;
-  phone?: string;
-  bio?: string;
-  description?: string;
-  address?: string;
-  appointmentTimeSlot: number;
-  consultationPricingRange: number;
-  medicalAids: MEDICAL_AID[];
-  category: PRACTITIONER_CATEGORY;
-  location?: Location;
-  isActive: boolean;
-  isVerified: boolean;
-  rating: number;
-  schedules: PractitionerScheduleDto[];
-  gender: GENDER;
-  languages: LANGUAGE[];
-  avatarUrl?: string;
+import { AddressDto } from 'src/shared/dtos/address.dto';
+import { Exclude, Expose } from 'class-transformer';
 
-  constructor(partial: Partial<PractitionerDto>) {
-    Object.assign(this, partial);
-  }
+@Exclude()
+export class PractitionerDto {
+  @Expose()
+  public id: string;
+  @Expose()
+  public title: string;
+  @Expose()
+  public email?: string;
+  @Expose()
+  public phone?: string;
+  @Expose()
+  public bio?: string;
+  @Expose()
+  public address?: AddressDto;
+  @Expose()
+  public appointmentTimeSlot: number;
+  @Expose()
+  public consultationPricingFrom?: number;
+  @Expose()
+  public consultationPricingTo?: number;
+  @Expose()
+  public category: PRACTITIONER_CATEGORY;
+  @Expose()
+  public rating: number;
+  @Expose()
+  public gender: GENDER;
+  @Expose()
+  public avatarUrl?: string;
+  @Expose()
+  public medicalAids: MEDICAL_AID[];
+  @Expose()
+  public schedules: PractitionerScheduleDto[];
+  @Expose()
+  public languages: LANGUAGE[];
+  @Expose()
+  public isActive: boolean;
+  @Expose()
+  public isVerified: boolean;
+  @Expose()
+  public isDisabled: boolean;
 }
