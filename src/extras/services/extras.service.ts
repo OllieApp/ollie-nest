@@ -78,9 +78,7 @@ class ExtrasService {
     }
 
     const testingTypesTotal =
-      testingTypesCount.pcrCount +
-      testingTypesCount.antibodyCount +
-      testingTypesCount.antigenCount;
+      testingTypesCount.pcrCount + testingTypesCount.antigenCount;
 
     if (numberOfPeople !== testingTypesTotal) {
       throw new BadRequestException({
@@ -100,7 +98,7 @@ class ExtrasService {
     covidTestingEntity.testingTypesCount = {
       pcrTestingCount: testingTypesCount.pcrCount,
       antigenTestingCount: testingTypesCount.antigenCount,
-      antibodyTestingCount: testingTypesCount.antibodyCount,
+      antibodyTestingCount: 0,
     };
     covidTestingEntity.userId = userId;
     covidTestingEntity.date = preferredDate.toUTC().toJSDate();
@@ -155,7 +153,7 @@ class ExtrasService {
         preferredDate.toFormat('dd.MM.yyyy'),
         testingTypesCount.pcrCount,
         testingTypesCount.antigenCount,
-        testingTypesCount.antibodyCount,
+        0,
         notes ?? '',
       ]);
     } catch (error) {
