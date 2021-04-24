@@ -210,6 +210,9 @@ class Practitioner {
   @Column({ name: 'avatar_url', nullable: true, type: 'text' })
   public avatarUrl?: string;
 
+  @Column({ name: 'cover_url', nullable: true, type: 'text' })
+  public coverUrl?: string;
+
   @OneToMany(
     type => Appointment,
     appointment => appointment.practitioner,
