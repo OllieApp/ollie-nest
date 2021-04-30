@@ -31,6 +31,7 @@ import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
+import { Point } from 'geojson';
 
 @Controller('/practitioners')
 export class PractitionersController {
@@ -95,8 +96,10 @@ export class PractitionersController {
           ...practitioner.addressObject,
           location: practitioner.addressObject.location
             ? {
-                latitude: practitioner.addressObject.location.bbox[0],
-                longitude: practitioner.addressObject.location.bbox[1],
+                latitude: (practitioner.addressObject.location as Point)
+                  ?.coordinates[0],
+                longitude: (practitioner.addressObject.location as Point)
+                  ?.coordinates[1],
               }
             : null,
         },
@@ -127,8 +130,10 @@ export class PractitionersController {
         ...practitioner.addressObject,
         location: practitioner.addressObject.location
           ? {
-              latitude: practitioner.addressObject.location.bbox[0],
-              longitude: practitioner.addressObject.location.bbox[1],
+              latitude: (practitioner.addressObject.location as Point)
+                ?.coordinates[0],
+              longitude: (practitioner.addressObject.location as Point)
+                ?.coordinates[1],
             }
           : null,
       },
@@ -169,8 +174,10 @@ export class PractitionersController {
         ...practitioner.addressObject,
         location: practitioner.addressObject.location
           ? {
-              latitude: practitioner.addressObject.location.bbox[0],
-              longitude: practitioner.addressObject.location.bbox[1],
+              latitude: (practitioner.addressObject.location as Point)
+                ?.coordinates[0],
+              longitude: (practitioner.addressObject.location as Point)
+                ?.coordinates[1],
             }
           : null,
       },
