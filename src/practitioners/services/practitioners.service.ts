@@ -118,15 +118,25 @@ export class PractitionersService {
     }
   }
 
-  async getPractitionersIdsForUserId(userId: string): Promise<Array<string>> {
+  async getPractitionersIdsForUserId(
+    userId: string,
+    isPowerUser: boolean = false,
+  ): Promise<Array<string>> {
     try {
-      return (
-        (
-          await this.practitionerRepository.find({
-            where: { createdById: userId },
-          })
-        )?.map(p => p.id) ?? []
-      );
+      let ids: Array<{
+        id: string;
+      }> = [];
+
+      ids = await this.practitionerRepository
+        .createQueryBuilder('practitioner')
+        .select(['practitioner.id'])
+        .where('practitioner.created_by = :userId OR TRUE = :isPowerUser ', {
+          userId: userId,
+          isPowerUser: isPowerUser,
+        })
+        .getRawMany();
+
+      return ids.map(p => p.id);
     } catch (error) {
       throw new InternalServerErrorException({
         message: [

@@ -32,6 +32,7 @@ import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { PHOTO_ALLOWED_EXTENSIONS } from 'src/constants';
 import { COUNTRY_CODE } from 'src/shared/models/country-code.model';
 import { Point } from 'geojson';
+import Practitioner from './entities/practitioner.entity';
 
 @Controller('/practitioners')
 export class PractitionersController {
@@ -147,12 +148,20 @@ export class PractitionersController {
     @Param('id') practitionerId: string,
   ): Promise<PractitionerDto> {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
-    const practitioner = await this.practitionersService.getPractitionerByUserId(
-      practitionerId,
-      userId,
-    );
+    let practitioner: Practitioner | null = null;
+
+    if (user.isPowerUser) {
+      practitioner = await this.practitionersService.getPractitionerById(
+        practitionerId,
+      );
+    } else {
+      practitioner = await this.practitionersService.getPractitionerByUserId(
+        practitionerId,
+        user.id,
+      );
+    }
 
     if (!practitioner) {
       throw new NotFoundException({
@@ -190,10 +199,13 @@ export class PractitionersController {
     @Request() req,
   ): Promise<PractitionerIdsForUserResponse> {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
     return new PractitionerIdsForUserResponse(
-      await this.practitionersService.getPractitionersIdsForUserId(userId),
+      await this.practitionersService.getPractitionersIdsForUserId(
+        user.id,
+        user.isPowerUser,
+      ),
     );
   }
 
@@ -206,16 +218,13 @@ export class PractitionersController {
     @Body() updatePractitionerReq: UpdatePractitionerRequest,
   ) {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
-    const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
-      userId,
+    await this.checkForPractitionerAccess(
+      user.id,
+      practitionerId,
+      user.isPowerUser,
     );
-    if (!userPractitionersIds.some(id => id == practitionerId)) {
-      throw new NotFoundException({
-        message: ['The practitioner could not be found.'],
-      });
-    }
 
     await this.practitionersService.updatePractitioner(
       practitionerId,
@@ -247,16 +256,14 @@ export class PractitionersController {
     @Param('id') practitionerId: string,
   ): Promise<string> {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
-    const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
-      userId,
+    await this.checkForPractitionerAccess(
+      user.id,
+      practitionerId,
+      user.isPowerUser,
     );
-    if (!userPractitionersIds.some(id => id == practitionerId)) {
-      throw new NotFoundException({
-        message: ['The practitioner to be updated could not be found.'],
-      });
-    }
+
     if (!req.file) {
       throw new BadRequestException({
         message: ['The image to be uploaded was missing from the request.'],
@@ -281,12 +288,20 @@ export class PractitionersController {
     @Param('id') practitionerId: string,
   ): Promise<PractitionerQualificationsResponse> {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
-    const practitioner = await this.practitionersService.getPractitionerByUserId(
-      practitionerId,
-      userId,
-    );
+    let practitioner: Practitioner | null = null;
+
+    if (user.isPowerUser) {
+      practitioner = await this.practitionersService.getPractitionerById(
+        practitionerId,
+      );
+    } else {
+      practitioner = await this.practitionersService.getPractitionerByUserId(
+        practitionerId,
+        user.id,
+      );
+    }
 
     if (!practitioner) {
       throw new NotFoundException({
@@ -317,12 +332,20 @@ export class PractitionersController {
     @Body() updateQualificationsReq: UpdateQualificationsRequest,
   ): Promise<PractitionerQualificationsResponse> {
     const firebaseUser = req.user as FirebaseUser;
-    const userId = await this.usersService.getUserIdForUid(firebaseUser.uid);
+    const user = await this.usersService.getUserForUid(firebaseUser.uid);
 
-    const practitioner = await this.practitionersService.getPractitionerByUserId(
-      practitionerId,
-      userId,
-    );
+    let practitioner: Practitioner | null = null;
+
+    if (user.isPowerUser) {
+      practitioner = await this.practitionersService.getPractitionerById(
+        practitionerId,
+      );
+    } else {
+      practitioner = await this.practitionersService.getPractitionerByUserId(
+        practitionerId,
+        user.id,
+      );
+    }
 
     if (!practitioner) {
       throw new NotFoundException({
@@ -345,5 +368,21 @@ export class PractitionersController {
         toDate: q.toDate?.toISOString(),
       })),
     };
+  }
+
+  private async checkForPractitionerAccess(
+    userId: string,
+    practitionerId: string,
+    isPowerUser: boolean,
+  ): Promise<void> {
+    const userPractitionersIds = await this.practitionersService.getPractitionersIdsForUserId(
+      userId,
+      isPowerUser,
+    );
+    if (!userPractitionersIds.some(id => id == practitionerId)) {
+      throw new NotFoundException({
+        message: ['The practitioner could not be found.'],
+      });
+    }
   }
 }

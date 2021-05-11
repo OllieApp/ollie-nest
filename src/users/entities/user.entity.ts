@@ -166,6 +166,15 @@ class User {
     { eager: false },
   )
   public updatedPractitionerEvents: Promise<PractitionerEvent[]>;
+
+  @Column({
+    type: 'boolean',
+    name: 'is_power_user',
+    nullable: false,
+    default: false,
+  })
+  @Index()
+  public isPowerUser: boolean;
 }
 
 export default User;
