@@ -5,6 +5,7 @@ import { PractitionerScheduleDto } from '../dto/practitioner-schedule.dto';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,10 +14,13 @@ import { DateTime, Interval, Zone } from 'luxon';
 
 @Injectable()
 export class PractitionerSchedulesService {
+  private readonly logger: Logger;
   constructor(
     @InjectRepository(PractitionerSchedule)
     private readonly schedulesRepository: Repository<PractitionerSchedule>,
-  ) {}
+  ) {
+    this.logger = new Logger(PractitionerSchedulesService.name);
+  }
 
   async injectDefaultSchedule(
     practitionerId: string,
@@ -32,11 +36,11 @@ export class PractitionerSchedulesService {
 
       return await this.schedulesRepository.save(schedules);
     } catch (error) {
+      this.logger.error(error);
       throw new InternalServerErrorException({
         message: [
           'Something went wrong while trying to insert the schedule values',
         ],
-        error: error,
       });
     }
   }
@@ -45,41 +49,40 @@ export class PractitionerSchedulesService {
     newSchedules: PractitionerScheduleDto[],
     practitionerId: string,
   ) {
-    try {
-      const schedules = this.mapScheduleModelsToScheduleEntities(
-        newSchedules,
-        practitionerId,
+    const schedules = this.mapScheduleModelsToScheduleEntities(
+      newSchedules,
+      practitionerId,
+    );
+
+    // we run this until the second to last element
+    // as there will be nothing to compare with for the last element
+    for (let index = 0; index < schedules.length - 1; index++) {
+      const currentSchedule = schedules[index];
+      const currentScheduleInterval = Interval.fromDateTimes(
+        DateTime.fromISO(currentSchedule.startTime),
+        DateTime.fromISO(currentSchedule.endTime),
       );
+      const restOfSchedules = schedules.slice(index + 1, schedules.length);
+      restOfSchedules.forEach(schedule => {
+        if (schedule.dayOfWeek != currentSchedule.dayOfWeek) {
+          return;
+        }
 
-      // we run this until the second to last element
-      // as there will be nothing to compare with for the last element
-      for (let index = 0; index < schedules.length - 1; index++) {
-        const currentSchedule = schedules[index];
-        const currentScheduleInterval = Interval.fromDateTimes(
-          DateTime.fromISO(currentSchedule.startTime),
-          DateTime.fromISO(currentSchedule.endTime),
+        const selectedScheduleInteval = Interval.fromDateTimes(
+          DateTime.fromISO(schedule.startTime),
+          DateTime.fromISO(schedule.endTime),
         );
-        const restOfSchedules = schedules.slice(index, length);
-        restOfSchedules.forEach(schedule => {
-          if (schedule.dayOfWeek != currentSchedule.dayOfWeek) {
-            return;
-          }
 
-          const selectedScheduleInteval = Interval.fromDateTimes(
-            DateTime.fromISO(schedule.startTime),
-            DateTime.fromISO(schedule.endTime),
-          );
-
-          if (currentScheduleInterval.overlaps(selectedScheduleInteval)) {
-            throw new UnprocessableEntityException({
-              message: [
-                'In the schedule collection times for the same day cannot overlap.',
-              ],
-            });
-          }
-        });
-      }
-
+        if (currentScheduleInterval.overlaps(selectedScheduleInteval)) {
+          throw new UnprocessableEntityException({
+            message: [
+              'In the schedule collection times for the same day cannot overlap.',
+            ],
+          });
+        }
+      });
+    }
+    try {
       // remove previous schedules
       await this.schedulesRepository.delete({
         practitionerId,
@@ -87,6 +90,7 @@ export class PractitionerSchedulesService {
 
       return await this.schedulesRepository.save(schedules);
     } catch (error) {
+      this.logger.error(error);
       throw new InternalServerErrorException({
         message: [
           'Something went wrong while trying to insert the schedule values',
@@ -117,7 +121,6 @@ export class PractitionerSchedulesService {
     practitionerId: string,
   ): PractitionerSchedule[] {
     const mappedSchedules = new Array<PractitionerSchedule>();
-    const dateReference = new Date();
     schedules.forEach(schedule => {
       mappedSchedules.push(
         ...schedule.daysOfWeek.map(dayOfWeek => {
